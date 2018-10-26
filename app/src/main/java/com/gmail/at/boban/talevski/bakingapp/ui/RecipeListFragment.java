@@ -1,7 +1,7 @@
 package com.gmail.at.boban.talevski.bakingapp.ui;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,24 +12,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.gmail.at.boban.talevski.bakingapp.R;
 import com.gmail.at.boban.talevski.bakingapp.adapter.RecipeAdapter;
-import com.gmail.at.boban.talevski.bakingapp.api.UdacityRecipeApi;
 import com.gmail.at.boban.talevski.bakingapp.model.Recipe;
-import com.gmail.at.boban.talevski.bakingapp.network.RetrofitClientInstance;
+import com.gmail.at.boban.talevski.bakingapp.viewmodel.RecipeListViewModel;
 
-import java.io.IOException;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class RecipeListFragment extends Fragment {
     public static final String TAG = RecipeListFragment.class.getSimpleName();
 
-    private RecipeListViewModel mViewModel;
+    private RecipeListViewModel viewModel;
+    private ProgressBar progressBar;
+    private RecyclerView recipeRecyclerView;
 
     // Mandatory empty constructor
     public RecipeListFragment(){}
@@ -41,32 +38,10 @@ public class RecipeListFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-
         final View rootView = inflater.inflate(R.layout.recipe_list_fragment, container, false);
 
-        RetrofitClientInstance.getRetrofitInstance().create(UdacityRecipeApi.class).getRecipes().enqueue(new Callback<List<Recipe>>() {
-            @Override
-            public void onResponse(Call<List<Recipe>> call, Response<List<Recipe>> response) {
-                Log.d(TAG, "response received");
-
-                RecyclerView recipeRecyclerView = rootView.findViewById(R.id.recipe_recycler_view);
-                RecipeAdapter recipeAdapter = new RecipeAdapter(response.body(), getContext());
-                recipeRecyclerView.setAdapter(recipeAdapter);
-                recipeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                recipeRecyclerView.setHasFixedSize(true);
-            }
-
-            @Override
-            public void onFailure(Call<List<Recipe>> call, Throwable t) {
-                Log.d(TAG, "response failure");
-                if (t instanceof IOException) {
-                    Log.d(TAG, "this is an actual network failure :( inform the user and possibly retry");
-                }
-                else {
-                    Log.d(TAG, "Probably conversion error - message: " + t.getMessage() );
-                }
-            }
-        });
+        progressBar = rootView.findViewById(R.id.loading_progress);
+        recipeRecyclerView = rootView.findViewById(R.id.recipe_recycler_view);
 
         return rootView;
     }
@@ -74,10 +49,38 @@ public class RecipeListFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = ViewModelProviders.of(this).get(RecipeListViewModel.class);
-        // TODO: Use the ViewModel
+        viewModel = ViewModelProviders.of(getActivity()).get(RecipeListViewModel.class);
+        setupViewModel();
 
+    }
 
+    private void setupViewModel() {
+        showProgressBar();
+        viewModel.getRecipes().observe(this, new Observer<List<Recipe>>() {
+            @Override
+            public void onChanged(@Nullable List<Recipe> recipes) {
+                Log.d(TAG, "onChanged");
+                populateUIWithRecipes(recipes);
+            }
+        });
+    }
+
+    private void populateUIWithRecipes(@Nullable List<Recipe> recipes) {
+        RecipeAdapter recipeAdapter = new RecipeAdapter(recipes, getContext());
+        recipeRecyclerView.setAdapter(recipeAdapter);
+        recipeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recipeRecyclerView.setHasFixedSize(true);
+        hideProgressBar();
+    }
+
+    private void hideProgressBar() {
+        progressBar.setVisibility(View.INVISIBLE);
+        recipeRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    private void showProgressBar() {
+        progressBar.setVisibility(View.VISIBLE);
+        recipeRecyclerView.setVisibility(View.INVISIBLE);
     }
 
 }
