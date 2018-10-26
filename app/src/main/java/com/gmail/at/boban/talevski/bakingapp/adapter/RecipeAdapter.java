@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.gmail.at.boban.talevski.bakingapp.R;
 import com.gmail.at.boban.talevski.bakingapp.model.Recipe;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -57,6 +58,14 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         public void bind(int position) {
             Recipe recipe = recipeList.get(position);
             cardRecipeTextView.setText(recipe.getName());
+            if (recipe.getImageUrl().isEmpty()) {
+                cardRecipeImage.setImageResource(R.drawable.no_image);
+            } else {
+                Picasso.get()
+                        .load(recipe.getImageUrl())
+                        .error(R.drawable.no_image)
+                        .into(cardRecipeImage);
+            }
         }
     }
 }
