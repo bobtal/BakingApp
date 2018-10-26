@@ -24,22 +24,5 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        RetrofitClientInstance.getRetrofitInstance().create(UdacityRecipeApi.class).getRecipes().enqueue(new Callback<List<Recipe>>() {
-            @Override
-            public void onResponse(Call<List<Recipe>> call, Response<List<Recipe>> response) {
-                Log.d(TAG, "response received");
-            }
-
-            @Override
-            public void onFailure(Call<List<Recipe>> call, Throwable t) {
-                Log.d(TAG, "response failure");
-                if (t instanceof IOException) {
-                    Log.d(TAG, "this is an actual network failure :( inform the user and possibly retry");
-                }
-                else {
-                    Log.d(TAG, "Probably conversion error - message: " + t.getMessage() );
-                }
-            }
-        });
     }
 }
