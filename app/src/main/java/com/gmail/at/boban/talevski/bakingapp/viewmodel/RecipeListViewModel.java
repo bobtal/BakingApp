@@ -6,7 +6,9 @@ import android.arch.lifecycle.ViewModel;
 import android.util.Log;
 
 import com.gmail.at.boban.talevski.bakingapp.api.UdacityRecipeApi;
+import com.gmail.at.boban.talevski.bakingapp.model.Ingredient;
 import com.gmail.at.boban.talevski.bakingapp.model.Recipe;
+import com.gmail.at.boban.talevski.bakingapp.model.Step;
 import com.gmail.at.boban.talevski.bakingapp.network.RetrofitClientInstance;
 
 import java.io.IOException;
@@ -20,6 +22,8 @@ public class RecipeListViewModel extends ViewModel {
     private static final String TAG = RecipeListViewModel.class.getSimpleName();
 
     private MutableLiveData<List<Recipe>> recipeList;
+    private MutableLiveData<List<Ingredient>> ingredientList;
+    private MutableLiveData<List<Step>> stepList;
 
 
     public LiveData<List<Recipe>> getRecipes() {
@@ -28,6 +32,22 @@ public class RecipeListViewModel extends ViewModel {
             loadRecipes();
         }
         return recipeList;
+    }
+
+    public LiveData<List<Ingredient>> getIngredientsForRecipe(int recipePosition) {
+        if (recipeList.getValue() != null) {
+            ingredientList.setValue(recipeList.getValue().get(recipePosition).getIngredients());
+            return ingredientList;
+        }
+        return new MutableLiveData<>();
+    }
+
+    public LiveData<List<Step>> getStepsForRecipe(int recipePosition) {
+        if (recipeList.getValue() != null) {
+            stepList.setValue(recipeList.getValue().get(recipePosition).getSteps());
+            return stepList;
+        }
+        return new MutableLiveData<>();
     }
 
     private void loadRecipes() {
@@ -57,4 +77,6 @@ public class RecipeListViewModel extends ViewModel {
                 });
 
     }
+
+
 }

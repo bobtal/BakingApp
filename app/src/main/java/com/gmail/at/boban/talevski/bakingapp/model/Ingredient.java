@@ -2,7 +2,7 @@ package com.gmail.at.boban.talevski.bakingapp.model;
 
 import com.google.gson.annotations.Expose;
 
-class Ingredient {
+public class Ingredient {
     @Expose
     private float quantity;
 

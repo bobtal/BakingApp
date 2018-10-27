@@ -2,7 +2,7 @@ package com.gmail.at.boban.talevski.bakingapp.model;
 
 import com.google.gson.annotations.Expose;
 
-class Step {
+public class Step {
 
     @Expose
     private int id;
