@@ -32,6 +32,9 @@ public class RecipeDetailsActivity extends AppCompatActivity {
             viewModel = ViewModelProviders.of(this).get(RecipeDetailsViewModel.class);
             ((RecipeDetailsViewModel) viewModel).setIngredientList(recipe.getIngredients());
             ((RecipeDetailsViewModel) viewModel).setStepList(recipe.getSteps());
+
+            // set title
+            getSupportActionBar().setTitle(recipe.getName());
         }
     }
 }
