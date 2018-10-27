@@ -65,7 +65,7 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
             } else {
                 Picasso.get().load(stepsList.get(position).getThumbnailURL()).into(recipeStepThumbnail);
             }
-            recipeStepIdText.setText(stepsList.get(position).getId());
+            recipeStepIdText.setText(String.valueOf(stepsList.get(position).getId()));
             recipeStepShortDescText.setText(stepsList.get(position).getShortDescription());
             recipeStepLongDescText.setText(stepsList.get(position).getDescription());
         }
