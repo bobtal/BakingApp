@@ -55,17 +55,21 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
         ImageView cardRecipeImage;
         TextView cardRecipeTextView;
+        TextView cardRecipeServingsTextView;
 
         public RecipeViewHolder(@NonNull View itemView) {
             super(itemView);
             cardRecipeImage = itemView.findViewById(R.id.card_recipe_image);
             cardRecipeTextView = itemView.findViewById(R.id.card_recipe_name);
+            cardRecipeServingsTextView = itemView.findViewById(R.id.card_recipe_servings);
             itemView.setOnClickListener(this);
         }
 
         public void bind(int position) {
             Recipe recipe = recipeList.get(position);
             cardRecipeTextView.setText(recipe.getName());
+            cardRecipeServingsTextView.setText(
+                    context.getString(R.string.servings, recipe.getServings()));
             if (recipe.getImageUrl().isEmpty()) {
                 cardRecipeImage.setImageResource(R.drawable.no_image);
             } else {

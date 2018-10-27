@@ -5,6 +5,7 @@
     <string name="steps_label">Instructions:</string>
 
     <string name="quantity">%1$s %2$f</string>
+    <string name="servings">Servings: %d</string>
 
     <!--Content descriptions-->
     <string name="recipe_image">Recipe Image</string>
