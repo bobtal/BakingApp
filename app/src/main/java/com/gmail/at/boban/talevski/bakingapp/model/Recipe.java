@@ -40,6 +40,8 @@ public class Recipe implements Parcelable {
     protected Recipe(Parcel in) {
         id = in.readInt();
         name = in.readString();
+        ingredients = in.createTypedArrayList(Ingredient.CREATOR);
+        steps = in.createTypedArrayList(Step.CREATOR);
         servings = in.readInt();
         imageUrl = in.readString();
     }
@@ -113,6 +115,8 @@ public class Recipe implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeInt(id);
         parcel.writeString(name);
+        parcel.writeTypedList(ingredients);
+        parcel.writeTypedList(steps);
         parcel.writeInt(servings);
         parcel.writeString(imageUrl);
     }

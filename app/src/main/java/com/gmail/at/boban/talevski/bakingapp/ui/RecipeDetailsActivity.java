@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
 import com.gmail.at.boban.talevski.bakingapp.R;
+import com.gmail.at.boban.talevski.bakingapp.model.Recipe;
 
 public class RecipeDetailsActivity extends AppCompatActivity {
 
@@ -18,7 +19,7 @@ public class RecipeDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_recipe_details);
 
         Intent intent = getIntent();
-
+        Recipe recipe = intent.getParcelableExtra(RecipeListFragment.EXTRA_RECIPE);
 
     }
 }
