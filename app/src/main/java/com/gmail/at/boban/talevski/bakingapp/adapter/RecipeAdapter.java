@@ -72,6 +72,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                     context.getString(R.string.servings, recipe.getServings()));
             if (recipe.getImageUrl().isEmpty()) {
                 cardRecipeImage.setImageResource(R.drawable.no_image);
+                cardRecipeImage.setVisibility(View.GONE);
             } else {
                 Picasso.get()
                         .load(recipe.getImageUrl())
