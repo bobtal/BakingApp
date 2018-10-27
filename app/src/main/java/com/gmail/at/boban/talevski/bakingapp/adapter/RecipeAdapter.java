@@ -71,6 +71,8 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             cardRecipeServingsTextView.setText(
                     context.getString(R.string.servings, recipe.getServings()));
             if (recipe.getImageUrl().isEmpty()) {
+                // add the noimage drawable to the ImageView, but remove it
+                // from the View hierarchy so it doesn't take up screen real estate for no reason
                 cardRecipeImage.setImageResource(R.drawable.no_image);
                 cardRecipeImage.setVisibility(View.GONE);
             } else {
