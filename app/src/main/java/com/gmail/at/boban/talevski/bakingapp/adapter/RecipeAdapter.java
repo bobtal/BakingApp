@@ -20,9 +20,16 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     private List<Recipe> recipeList;
     private Context context;
 
-    public RecipeAdapter(List<Recipe> recipeList, Context context) {
+    private OnListItemClick clickHandler;
+
+    public interface OnListItemClick {
+        void onListItemClick(Recipe recipe);
+    }
+
+    public RecipeAdapter(List<Recipe> recipeList, Context context, OnListItemClick clickHandler) {
         this.recipeList = recipeList;
         this.context = context;
+        this.clickHandler = clickHandler;
     }
 
     @NonNull
@@ -44,7 +51,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         return recipeList.size();
     }
 
-    public class RecipeViewHolder extends RecyclerView.ViewHolder {
+    public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         ImageView cardRecipeImage;
         TextView cardRecipeTextView;
@@ -53,6 +60,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             super(itemView);
             cardRecipeImage = itemView.findViewById(R.id.card_recipe_image);
             cardRecipeTextView = itemView.findViewById(R.id.card_recipe_name);
+            itemView.setOnClickListener(this);
         }
 
         public void bind(int position) {
@@ -66,6 +74,11 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                         .error(R.drawable.no_image)
                         .into(cardRecipeImage);
             }
+        }
+
+        @Override
+        public void onClick(View view) {
+            clickHandler.onListItemClick(recipeList.get(getAdapterPosition()));
         }
     }
 }

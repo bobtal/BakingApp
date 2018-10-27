@@ -2,6 +2,7 @@ package com.gmail.at.boban.talevski.bakingapp.ui;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,8 +22,9 @@ import com.gmail.at.boban.talevski.bakingapp.viewmodel.RecipeListViewModel;
 
 import java.util.List;
 
-public class RecipeListFragment extends Fragment {
+public class RecipeListFragment extends Fragment implements RecipeAdapter.OnListItemClick {
     public static final String TAG = RecipeListFragment.class.getSimpleName();
+    public static final String EXTRA_RECIPE = "com.gmail.at.boban.talevski.bakingapp.ui.EXTRA_RECIPE";
 
     private RecipeListViewModel viewModel;
     private ProgressBar progressBar;
@@ -66,7 +68,7 @@ public class RecipeListFragment extends Fragment {
     }
 
     private void populateUIWithRecipes(@Nullable List<Recipe> recipes) {
-        RecipeAdapter recipeAdapter = new RecipeAdapter(recipes, getContext());
+        RecipeAdapter recipeAdapter = new RecipeAdapter(recipes, getActivity(), this);
         recipeRecyclerView.setAdapter(recipeAdapter);
         recipeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recipeRecyclerView.setHasFixedSize(true);
@@ -83,4 +85,10 @@ public class RecipeListFragment extends Fragment {
         recipeRecyclerView.setVisibility(View.INVISIBLE);
     }
 
+    @Override
+    public void onListItemClick(Recipe recipe) {
+        Intent intent = new Intent(getActivity(), RecipeDetailsActivity.class);
+        intent.putExtra(EXTRA_RECIPE, recipe);
+        startActivity(intent);
+    }
 }

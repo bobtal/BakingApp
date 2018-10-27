@@ -1,9 +1,11 @@
 package com.gmail.at.boban.talevski.bakingapp;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.gmail.at.boban.talevski.bakingapp.adapter.RecipeAdapter;
 import com.gmail.at.boban.talevski.bakingapp.api.UdacityRecipeApi;
 import com.gmail.at.boban.talevski.bakingapp.model.Recipe;
 import com.gmail.at.boban.talevski.bakingapp.network.RetrofitClientInstance;
