@@ -7,6 +7,9 @@
     <string name="quantity">%1$s %2$f</string>
     <string name="servings">Servings: %d</string>
 
+    <!--Error messages-->
+    <string name="no_internet">Can\'t fetch data, no Internet connectivity</string>
+
     <!--Content descriptions-->
     <string name="recipe_image">Recipe Image</string>
 
