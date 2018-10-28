@@ -17,12 +17,19 @@ import java.util.List;
 
 public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder> {
 
-    Context context;
-    List<Step> stepsList;
+    private Context context;
+    private List<Step> stepsList;
 
-    public StepAdapter(Context context, List<Step> stepsList) {
+    private OnClickHandler clickHandler;
+
+    public interface OnClickHandler {
+        void onListItemClick(Step step);
+    }
+
+    public StepAdapter(Context context, OnClickHandler clickHandler, List<Step> stepsList) {
         this.context = context;
         this.stepsList = stepsList;
+        this.clickHandler = clickHandler;
     }
 
     @NonNull
@@ -44,7 +51,7 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
         return stepsList.size();
     }
 
-    public class StepViewHolder extends RecyclerView.ViewHolder{
+    public class StepViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         ImageView recipeStepThumbnail;
         TextView recipeStepIdText;
@@ -57,6 +64,7 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
             recipeStepIdText = itemView.findViewById(R.id.card_recipe_step_id);
             recipeStepShortDescText = itemView.findViewById(R.id.card_recipe_step_short_desc);
             recipeStepLongDescText = itemView.findViewById(R.id.card_recipe_step_long_desc);
+            itemView.setOnClickListener(this);
         }
 
         public void bind(int position) {
@@ -68,6 +76,11 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
             recipeStepIdText.setText(String.valueOf(stepsList.get(position).getId()));
             recipeStepShortDescText.setText(stepsList.get(position).getShortDescription());
             recipeStepLongDescText.setText(stepsList.get(position).getDescription());
+        }
+
+        @Override
+        public void onClick(View view) {
+            clickHandler.onListItemClick(stepsList.get(getAdapterPosition()));
         }
     }
 }

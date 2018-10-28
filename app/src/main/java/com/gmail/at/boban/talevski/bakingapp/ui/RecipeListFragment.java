@@ -23,7 +23,7 @@ import com.gmail.at.boban.talevski.bakingapp.viewmodel.RecipeListViewModel;
 import java.util.List;
 
 public class RecipeListFragment extends Fragment implements RecipeAdapter.OnListItemClick {
-    public static final String TAG = RecipeListFragment.class.getSimpleName();
+    private static final String TAG = RecipeListFragment.class.getSimpleName();
     public static final String EXTRA_RECIPE = "com.gmail.at.boban.talevski.bakingapp.ui.EXTRA_RECIPE";
 
     private RecipeListViewModel viewModel;
@@ -67,7 +67,7 @@ public class RecipeListFragment extends Fragment implements RecipeAdapter.OnList
     }
 
     private void populateUIWithRecipes(@Nullable List<Recipe> recipes) {
-        RecipeAdapter recipeAdapter = new RecipeAdapter(recipes, getActivity(), this);
+        RecipeAdapter recipeAdapter = new RecipeAdapter(getActivity(), this, recipes);
         recipeRecyclerView.setAdapter(recipeAdapter);
         recipeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recipeRecyclerView.setHasFixedSize(true);

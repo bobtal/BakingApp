@@ -9,7 +9,6 @@ import com.gmail.at.boban.talevski.bakingapp.model.Step;
 import java.util.List;
 
 public class RecipeDetailsViewModel extends ViewModel {
-    // TODO: Implement the ViewModel
     private List<Ingredient> ingredientList;
     private List<Step> stepList;
 

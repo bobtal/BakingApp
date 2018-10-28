@@ -26,10 +26,10 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         void onListItemClick(Recipe recipe);
     }
 
-    public RecipeAdapter(List<Recipe> recipeList, Context context, OnListItemClick clickHandler) {
-        this.recipeList = recipeList;
+    public RecipeAdapter(Context context, OnListItemClick clickHandler, List<Recipe> recipeList) {
         this.context = context;
         this.clickHandler = clickHandler;
+        this.recipeList = recipeList;
     }
 
     @NonNull
