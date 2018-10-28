@@ -53,7 +53,6 @@ public class RecipeListFragment extends Fragment implements RecipeAdapter.OnList
         super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(getActivity()).get(RecipeListViewModel.class);
         setupViewModel();
-
     }
 
     private void setupViewModel() {
