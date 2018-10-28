@@ -28,8 +28,10 @@ public class RecipeDetailsFragment extends Fragment implements StepAdapter.OnCli
             "com.gmail.at.boban.talevski.bakingapp.ui.EXTRA_STEP_LIST";
     public static final String EXTRA_STEP_POSITION =
             "com.gmail.at.boban.talevski.bakingapp.ui.EXTRA_STEP_POSITION";
+    private static final String EXTRA_RECIPE_NAME =
+            "com.gmail.at.boban.talevski.bakingapp.ui.EXTRA_RECIPE_NAME";
 
-    private RecipeDetailsViewModel mViewModel;
+    private RecipeDetailsViewModel viewModel;
     private RecyclerView ingredientsRecyclerView;
     private RecyclerView stepsRecyclerView;
 
@@ -49,15 +51,15 @@ public class RecipeDetailsFragment extends Fragment implements StepAdapter.OnCli
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = ViewModelProviders.of(getActivity()).get(RecipeDetailsViewModel.class);
+        viewModel = ViewModelProviders.of(getActivity()).get(RecipeDetailsViewModel.class);
 
         IngredientAdapter ingredientAdapter =
-                new IngredientAdapter(getActivity(), mViewModel.getIngredientList());
+                new IngredientAdapter(getActivity(), viewModel.getIngredientList());
         ingredientsRecyclerView.setAdapter(ingredientAdapter);
         ingredientsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         ingredientsRecyclerView.setHasFixedSize(true);
 
-        StepAdapter stepAdapter = new StepAdapter(getActivity(), this, mViewModel.getStepList());
+        StepAdapter stepAdapter = new StepAdapter(getActivity(), this, viewModel.getStepList());
         stepsRecyclerView.setAdapter(stepAdapter);
         stepsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         stepsRecyclerView.setHasFixedSize(true);
@@ -68,6 +70,7 @@ public class RecipeDetailsFragment extends Fragment implements StepAdapter.OnCli
         Intent intent = new Intent(getActivity(), RecipeStepDetailsActivity.class);
         intent.putParcelableArrayListExtra(EXTRA_STEP_LIST, (ArrayList<? extends Parcelable>) stepsList);
         intent.putExtra(EXTRA_STEP_POSITION, stepPosition);
+        intent.putExtra(EXTRA_RECIPE_NAME, viewModel.getRecipeName());
         startActivity(intent);
     }
 }
