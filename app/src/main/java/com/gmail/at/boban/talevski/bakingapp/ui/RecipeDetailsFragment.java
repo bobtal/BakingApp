@@ -28,7 +28,7 @@ public class RecipeDetailsFragment extends Fragment implements StepAdapter.OnCli
             "com.gmail.at.boban.talevski.bakingapp.ui.EXTRA_STEP_LIST";
     public static final String EXTRA_STEP_POSITION =
             "com.gmail.at.boban.talevski.bakingapp.ui.EXTRA_STEP_POSITION";
-    private static final String EXTRA_RECIPE_NAME =
+    public static final String EXTRA_RECIPE_NAME =
             "com.gmail.at.boban.talevski.bakingapp.ui.EXTRA_RECIPE_NAME";
 
     private RecipeDetailsViewModel viewModel;
