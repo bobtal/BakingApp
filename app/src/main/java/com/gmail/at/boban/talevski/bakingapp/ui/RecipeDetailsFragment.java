@@ -3,6 +3,7 @@ package com.gmail.at.boban.talevski.bakingapp.ui;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,9 +19,15 @@ import com.gmail.at.boban.talevski.bakingapp.adapter.StepAdapter;
 import com.gmail.at.boban.talevski.bakingapp.model.Step;
 import com.gmail.at.boban.talevski.bakingapp.viewmodel.RecipeDetailsViewModel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class RecipeDetailsFragment extends Fragment implements StepAdapter.OnClickHandler {
     private static final String TAG = RecipeDetailsFragment.class.getSimpleName();
-    public static final String EXTRA_STEP = "com.gmail.at.boban.talevski.bakingapp.ui.EXTRA_STEP";;
+    public static final String EXTRA_STEP_LIST =
+            "com.gmail.at.boban.talevski.bakingapp.ui.EXTRA_STEP_LIST";;
+    public static final String EXTRA_STEP_POSITION =
+            "com.gmail.at.boban.talevski.bakingapp.ui.EXTRA_STEP_POSITION";;
 
     private RecipeDetailsViewModel mViewModel;
     private RecyclerView ingredientsRecyclerView;
@@ -57,9 +64,10 @@ public class RecipeDetailsFragment extends Fragment implements StepAdapter.OnCli
     }
 
     @Override
-    public void onListItemClick(Step step) {
+    public void onListItemClick(List<Step> stepsList, int stepPosition) {
         Intent intent = new Intent(getActivity(), RecipeStepDetailsActivity.class);
-        intent.putExtra(EXTRA_STEP, step);
+        intent.putParcelableArrayListExtra(EXTRA_STEP_LIST, (ArrayList<? extends Parcelable>) stepsList);
+        intent.putExtra(EXTRA_STEP_POSITION, stepPosition);
         startActivity(intent);
     }
 }
