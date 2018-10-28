@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.gmail.at.boban.talevski.bakingapp.R;
+import com.gmail.at.boban.talevski.bakingapp.viewmodel.RecipeStepDetailsViewModel;
 
 public class RecipeStepDetailsFragment extends Fragment {
 
