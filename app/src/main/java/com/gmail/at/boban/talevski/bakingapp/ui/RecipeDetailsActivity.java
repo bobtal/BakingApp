@@ -13,9 +13,7 @@ import com.gmail.at.boban.talevski.bakingapp.viewmodel.RecipeDetailsViewModel;
 
 public class RecipeDetailsActivity extends AppCompatActivity {
 
-    RecyclerView ingredientsRecyclerView;
-    RecyclerView stepsRecyclerView;
-    ViewModel viewModel;
+    RecipeDetailsViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,8 +28,8 @@ public class RecipeDetailsActivity extends AppCompatActivity {
         if (intent != null && intent.hasExtra(RecipeListFragment.EXTRA_RECIPE)) {
             Recipe recipe = intent.getParcelableExtra(RecipeListFragment.EXTRA_RECIPE);
             viewModel = ViewModelProviders.of(this).get(RecipeDetailsViewModel.class);
-            ((RecipeDetailsViewModel) viewModel).setIngredientList(recipe.getIngredients());
-            ((RecipeDetailsViewModel) viewModel).setStepList(recipe.getSteps());
+            viewModel.setIngredientList(recipe.getIngredients());
+            viewModel.setStepList(recipe.getSteps());
 
             // set title
             getSupportActionBar().setTitle(recipe.getName());
