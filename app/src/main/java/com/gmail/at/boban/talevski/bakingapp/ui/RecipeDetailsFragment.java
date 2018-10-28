@@ -25,9 +25,9 @@ import java.util.List;
 public class RecipeDetailsFragment extends Fragment implements StepAdapter.OnClickHandler {
     private static final String TAG = RecipeDetailsFragment.class.getSimpleName();
     public static final String EXTRA_STEP_LIST =
-            "com.gmail.at.boban.talevski.bakingapp.ui.EXTRA_STEP_LIST";;
+            "com.gmail.at.boban.talevski.bakingapp.ui.EXTRA_STEP_LIST";
     public static final String EXTRA_STEP_POSITION =
-            "com.gmail.at.boban.talevski.bakingapp.ui.EXTRA_STEP_POSITION";;
+            "com.gmail.at.boban.talevski.bakingapp.ui.EXTRA_STEP_POSITION";
 
     private RecipeDetailsViewModel mViewModel;
     private RecyclerView ingredientsRecyclerView;
