@@ -9,6 +9,7 @@ import java.util.List;
 public class RecipeStepDetailsViewModel extends ViewModel {
     private List<Step> stepList;
     private int stepPosition;
+    private String recipeName;
 
     public List<Step> getStepList() {
         return stepList;
@@ -26,4 +27,11 @@ public class RecipeStepDetailsViewModel extends ViewModel {
         this.stepPosition = stepPosition;
     }
 
+    public String getRecipeName() {
+        return recipeName;
+    }
+
+    public void setRecipeName(String recipeName) {
+        this.recipeName = recipeName;
+    }
 }

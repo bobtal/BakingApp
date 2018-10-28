@@ -29,9 +29,14 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
                 intent.hasExtra(RecipeDetailsFragment.EXTRA_STEP_POSITION)) {
             List<Step> steps = intent.getParcelableArrayListExtra(RecipeDetailsFragment.EXTRA_STEP_LIST);
             int stepPosition = intent.getIntExtra(RecipeDetailsFragment.EXTRA_STEP_POSITION, -1);
+            String recipeName = intent.getStringExtra(RecipeDetailsFragment.EXTRA_RECIPE_NAME);
             viewModel = ViewModelProviders.of(this).get(RecipeStepDetailsViewModel.class);
             viewModel.setStepList(steps);
             viewModel.setStepPosition(stepPosition);
+            viewModel.setRecipeName(recipeName);
+
+            // set title
+            getSupportActionBar().setTitle(recipeName);
         }
     }
 }
