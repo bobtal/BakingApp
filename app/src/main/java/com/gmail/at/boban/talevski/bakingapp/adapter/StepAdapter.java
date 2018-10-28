@@ -68,10 +68,10 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
         }
 
         public void bind(int position) {
-            if (stepsList.get(position).getThumbnailURL().isEmpty()) {
+            if (stepsList.get(position).getThumbnailUrl().isEmpty()) {
                 recipeStepThumbnail.setImageResource(R.drawable.no_image);
             } else {
-                Picasso.get().load(stepsList.get(position).getThumbnailURL()).into(recipeStepThumbnail);
+                Picasso.get().load(stepsList.get(position).getThumbnailUrl()).into(recipeStepThumbnail);
             }
             recipeStepIdText.setText(String.valueOf(stepsList.get(position).getId()));
             recipeStepShortDescText.setText(stepsList.get(position).getShortDescription());
