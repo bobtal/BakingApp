@@ -27,8 +27,6 @@ public class RecipeListViewModel extends AndroidViewModel {
     private static final String TAG = RecipeListViewModel.class.getSimpleName();
 
     private MutableLiveData<List<Recipe>> recipeList;
-    private MutableLiveData<List<Ingredient>> ingredientList;
-    private MutableLiveData<List<Step>> stepList;
 
     public RecipeListViewModel(@NonNull Application application) {
         super(application);
@@ -41,22 +39,6 @@ public class RecipeListViewModel extends AndroidViewModel {
             loadRecipes();
         }
         return recipeList;
-    }
-
-    public LiveData<List<Ingredient>> getIngredientsForRecipe(int recipePosition) {
-        if (recipeList.getValue() != null) {
-            ingredientList.setValue(recipeList.getValue().get(recipePosition).getIngredients());
-            return ingredientList;
-        }
-        return new MutableLiveData<>();
-    }
-
-    public LiveData<List<Step>> getStepsForRecipe(int recipePosition) {
-        if (recipeList.getValue() != null) {
-            stepList.setValue(recipeList.getValue().get(recipePosition).getSteps());
-            return stepList;
-        }
-        return new MutableLiveData<>();
     }
 
     private void loadRecipes() {
