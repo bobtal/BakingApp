@@ -10,17 +10,21 @@
     <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/recipe_step_details_player_view"
         android:layout_width="match_parent"
+        android:layout_margin="8dp"
         android:layout_height="0dp"
         android:layout_weight="5" />
 
     <TextView
+        android:id="@+id/recipe_step_details_instructions_textview"
         android:layout_width="match_parent"
+        android:layout_margin="8dp"
         android:layout_height="0dp"
         android:layout_weight="5" />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_margin="8dp"
         android:layout_weight="1">
 
         <Button
