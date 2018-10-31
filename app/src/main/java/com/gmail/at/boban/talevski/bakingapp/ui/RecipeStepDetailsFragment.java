@@ -28,6 +28,9 @@ public class RecipeStepDetailsFragment extends Fragment {
     private PlayerView playerView;
     private TextView stepInstructions;
 
+    // Mandatory empty constructor
+    public RecipeStepDetailsFragment() {}
+
     public static RecipeStepDetailsFragment newInstance() {
         return new RecipeStepDetailsFragment();
     }

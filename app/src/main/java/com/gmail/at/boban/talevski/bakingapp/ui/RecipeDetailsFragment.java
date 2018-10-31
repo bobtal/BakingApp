@@ -35,6 +35,9 @@ public class RecipeDetailsFragment extends Fragment implements StepAdapter.OnCli
     private RecyclerView ingredientsRecyclerView;
     private RecyclerView stepsRecyclerView;
 
+    // Mandatory empty constructor
+    public RecipeDetailsFragment() {}
+
     public static RecipeDetailsFragment newInstance() {
         return new RecipeDetailsFragment();
     }
