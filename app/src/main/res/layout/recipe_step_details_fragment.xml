@@ -28,7 +28,7 @@
         android:layout_weight="1">
 
         <Button
-            android:id="@+id/button_previous"
+            android:id="@+id/recipe_step_details_button_previous"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
@@ -36,7 +36,7 @@
             app:backgroundTint="@color/colorPrimary" />
 
         <Button
-            android:id="@+id/button_next"
+            android:id="@+id/recipe_step_details_button_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
