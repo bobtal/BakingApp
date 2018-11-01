@@ -13,14 +13,18 @@ import java.util.List;
 
 public class RecipeStepDetailsActivity extends AppCompatActivity {
 
-    private RecipeStepDetailsViewModel viewModel;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_step_details);
 
-        setupViewModel();
+        if (savedInstanceState == null) {
+            // setup viewmodel only if savedInstanceState is null,
+            // meaning it's a "fresh" start of the activity.
+            // Otherwise, if it's a device rotation, we already have the viewmodel set up
+            // and should use its current values (like the step position)
+            setupViewModel();
+        }
     }
 
     private void setupViewModel() {
@@ -30,7 +34,7 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
             List<Step> steps = intent.getParcelableArrayListExtra(RecipeDetailsFragment.EXTRA_STEP_LIST);
             int stepPosition = intent.getIntExtra(RecipeDetailsFragment.EXTRA_STEP_POSITION, -1);
             String recipeName = intent.getStringExtra(RecipeDetailsFragment.EXTRA_RECIPE_NAME);
-            viewModel = ViewModelProviders.of(this).get(RecipeStepDetailsViewModel.class);
+            RecipeStepDetailsViewModel viewModel = ViewModelProviders.of(this).get(RecipeStepDetailsViewModel.class);
             viewModel.setStepList(steps);
             viewModel.setStepPosition(stepPosition);
             viewModel.setRecipeName(recipeName);
