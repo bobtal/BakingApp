@@ -31,6 +31,8 @@ public class RecipeStepDetailsFragment extends Fragment {
     private Button nextStepButton, previousStepButton;
     private SimpleExoPlayer player;
 
+    private boolean landscape;
+
     // Mandatory empty constructor
     public RecipeStepDetailsFragment() {}
 
@@ -46,6 +48,11 @@ public class RecipeStepDetailsFragment extends Fragment {
         stepInstructions = view.findViewById(R.id.recipe_step_details_instructions_textview);
         nextStepButton = view.findViewById(R.id.recipe_step_details_button_next);
         previousStepButton = view.findViewById(R.id.recipe_step_details_button_previous);
+        if (stepInstructions == null) {
+            // step instructions view is not present in the landscape layout
+            // so if that's the case we are in landscape mode
+            landscape = true;
+        }
         return view;
     }
 
@@ -54,7 +61,10 @@ public class RecipeStepDetailsFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mViewModel = ViewModelProviders.of(getActivity()).get(RecipeStepDetailsViewModel.class);
 
-        setInstructionText();
+        if (!landscape) {
+            // set this only if we are not in landscape mode
+            setInstructionText();
+        }
         initializePlayer();
         setupPlayerMediaSource();
         initializeButtons();
@@ -88,7 +98,10 @@ public class RecipeStepDetailsFragment extends Fragment {
 
     private void updateUI() {
         // updates the UI after a button click (prev/next)
-        setInstructionText();
+        if (!landscape) {
+            // set this only if we are not in landscape mode
+            setInstructionText();
+        }
         setupPlayerMediaSource();
         setButtonVisibility();
     }
