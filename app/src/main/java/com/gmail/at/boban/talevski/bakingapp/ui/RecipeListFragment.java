@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -67,9 +68,10 @@ public class RecipeListFragment extends Fragment implements RecipeAdapter.OnList
     }
 
     private void populateUIWithRecipes(@Nullable List<Recipe> recipes) {
+        int numberOfColumns = getActivity().getResources().getInteger(R.integer.columns);
         RecipeAdapter recipeAdapter = new RecipeAdapter(getActivity(), this, recipes);
         recipeRecyclerView.setAdapter(recipeAdapter);
-        recipeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recipeRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), numberOfColumns));
         recipeRecyclerView.setHasFixedSize(true);
         hideProgressBar();
     }
