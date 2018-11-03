@@ -39,7 +39,12 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_step_details);
 
-        setupViewModel();
+        boolean isFreshStart = savedInstanceState == null;
+        // true if it's a fresh start of activity, not a configuration change (rotation)
+        setupViewModel(isFreshStart);
+
+        // set title
+        getSupportActionBar().setTitle(viewModel.getRecipeName());
 
         playerView = findViewById(R.id.recipe_step_details_player_view);
         stepInstructions = findViewById(R.id.recipe_step_details_instructions_textview);
@@ -62,20 +67,27 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
         setButtonVisibility();
     }
 
-    private void setupViewModel() {
-        Intent intent = getIntent();
-        if (intent != null && intent.hasExtra(RecipeDetailsFragment.EXTRA_STEP_LIST) &&
-                intent.hasExtra(RecipeDetailsFragment.EXTRA_STEP_POSITION)) {
-            List<Step> steps = intent.getParcelableArrayListExtra(RecipeDetailsFragment.EXTRA_STEP_LIST);
-            int stepPosition = intent.getIntExtra(RecipeDetailsFragment.EXTRA_STEP_POSITION, -1);
-            String recipeName = intent.getStringExtra(RecipeDetailsFragment.EXTRA_RECIPE_NAME);
-            viewModel = ViewModelProviders.of(this).get(RecipeStepDetailsViewModel.class);
-            viewModel.setStepList(steps);
-            viewModel.setStepPosition(stepPosition);
-            viewModel.setRecipeName(recipeName);
+    private void setupViewModel(boolean isFreshStart) {
+        // registers the viewmodel in any case
+        viewModel = ViewModelProviders.of(this).get(RecipeStepDetailsViewModel.class);
 
-            // set title
-            getSupportActionBar().setTitle(recipeName);
+        // if it's a fresh activity start, acquire data from the intent to set it up in the viewmodel
+        // otherwise do nothing, as the viewmodel is already filled with data
+        // which might have already changed
+        // step position mostly, it could've been changed by clicking next/prev buttons
+        // and the update is already recorded in the viewmodel
+        if (isFreshStart) {
+            Intent intent = getIntent();
+            if (intent != null && intent.hasExtra(RecipeDetailsFragment.EXTRA_STEP_LIST) &&
+                    intent.hasExtra(RecipeDetailsFragment.EXTRA_STEP_POSITION)) {
+                List<Step> steps = intent.getParcelableArrayListExtra(RecipeDetailsFragment.EXTRA_STEP_LIST);
+                int stepPosition = intent.getIntExtra(RecipeDetailsFragment.EXTRA_STEP_POSITION, -1);
+                String recipeName = intent.getStringExtra(RecipeDetailsFragment.EXTRA_RECIPE_NAME);
+
+                viewModel.setStepList(steps);
+                viewModel.setStepPosition(stepPosition);
+                viewModel.setRecipeName(recipeName);
+            }
         }
     }
 
@@ -88,7 +100,7 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
         previousStepButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                viewModel.setStepPosition(viewModel.getStepPosition() - 1);
+                viewModel.setStepPosition(viewModel.getStepPosition().getValue() - 1);
                 playerView.getPlayer().stop();
                 updateUI();
             }
@@ -97,7 +109,7 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
         nextStepButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                viewModel.setStepPosition(viewModel.getStepPosition() + 1);
+                viewModel.setStepPosition(viewModel.getStepPosition().getValue() + 1);
                 playerView.getPlayer().stop();
                 updateUI();
             }
@@ -115,8 +127,8 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
     }
 
     private void setInstructionText() {
-        String instruction = viewModel.getStepList().get(viewModel.getStepPosition()).getShortDescription() +
-                "\n" + viewModel.getStepList().get(viewModel.getStepPosition()).getDescription();
+        String instruction = viewModel.getStepList().get(viewModel.getStepPosition().getValue()).getShortDescription() +
+                "\n" + viewModel.getStepList().get(viewModel.getStepPosition().getValue()).getDescription();
         stepInstructions.setText(instruction);
     }
 
@@ -126,7 +138,7 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
                 Util.getUserAgent(this, getString(R.string.app_name)));
         // This is the MediaSource representing the media to be played.
         MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(Uri.parse(viewModel.getStepList().get(viewModel.getStepPosition()).getVideoUrl()));
+                .createMediaSource(Uri.parse(viewModel.getStepList().get(viewModel.getStepPosition().getValue()).getVideoUrl()));
         // Prepare the player with the source.
         player.prepare(videoSource);
 
@@ -135,7 +147,7 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
     }
 
     private void setButtonVisibility() {
-        if (viewModel.getStepPosition() == 0) {
+        if (viewModel.getStepPosition().getValue() == 0) {
             // we are at the first step, no need for previous button
             previousStepButton.setVisibility(View.GONE);
         } else {
@@ -143,7 +155,7 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
             // been removed if the user was at the first step at some point
             previousStepButton.setVisibility(View.VISIBLE);
         }
-        if (viewModel.getStepPosition() == viewModel.getStepList().size() - 1) {
+        if (viewModel.getStepPosition().getValue() == viewModel.getStepList().size() - 1) {
             // we are at the last step, no need for next button
             nextStepButton.setVisibility(View.GONE);
         } else {
