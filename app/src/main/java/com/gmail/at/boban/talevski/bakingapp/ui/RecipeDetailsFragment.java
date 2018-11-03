@@ -18,6 +18,7 @@ import com.gmail.at.boban.talevski.bakingapp.adapter.IngredientAdapter;
 import com.gmail.at.boban.talevski.bakingapp.adapter.StepAdapter;
 import com.gmail.at.boban.talevski.bakingapp.model.Step;
 import com.gmail.at.boban.talevski.bakingapp.viewmodel.RecipeDetailsViewModel;
+import com.gmail.at.boban.talevski.bakingapp.viewmodel.RecipeStepDetailsViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,9 +32,10 @@ public class RecipeDetailsFragment extends Fragment implements StepAdapter.OnCli
     public static final String EXTRA_RECIPE_NAME =
             "com.gmail.at.boban.talevski.bakingapp.ui.EXTRA_RECIPE_NAME";
 
-    private RecipeDetailsViewModel viewModel;
+    private RecipeDetailsViewModel masterViewModel;
     private RecyclerView ingredientsRecyclerView;
     private RecyclerView stepsRecyclerView;
+    private RecipeStepDetailsViewModel stepDetailsViewModel;
 
     // Mandatory empty constructor
     public RecipeDetailsFragment() {}
@@ -54,15 +56,20 @@ public class RecipeDetailsFragment extends Fragment implements StepAdapter.OnCli
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        viewModel = ViewModelProviders.of(getActivity()).get(RecipeDetailsViewModel.class);
+        masterViewModel = ViewModelProviders.of(getActivity()).get(RecipeDetailsViewModel.class);
+        if (masterViewModel.isTwoPane()) {
+            // Also register the details view model to be able to
+            // send data updates to the details fragment on step click
+            stepDetailsViewModel = ViewModelProviders.of(getActivity()).get(RecipeStepDetailsViewModel.class);
+        }
 
         IngredientAdapter ingredientAdapter =
-                new IngredientAdapter(getActivity(), viewModel.getIngredientList());
+                new IngredientAdapter(getActivity(), masterViewModel.getIngredientList());
         ingredientsRecyclerView.setAdapter(ingredientAdapter);
         ingredientsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         ingredientsRecyclerView.setHasFixedSize(true);
 
-        StepAdapter stepAdapter = new StepAdapter(getActivity(), this, viewModel.getStepList());
+        StepAdapter stepAdapter = new StepAdapter(getActivity(), this, masterViewModel.getStepList());
         stepsRecyclerView.setAdapter(stepAdapter);
         stepsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         stepsRecyclerView.setHasFixedSize(true);
@@ -70,10 +77,14 @@ public class RecipeDetailsFragment extends Fragment implements StepAdapter.OnCli
 
     @Override
     public void onListItemClick(List<Step> stepsList, int stepPosition) {
-        Intent intent = new Intent(getActivity(), RecipeStepDetailsActivity.class);
-        intent.putParcelableArrayListExtra(EXTRA_STEP_LIST, (ArrayList<? extends Parcelable>) stepsList);
-        intent.putExtra(EXTRA_STEP_POSITION, stepPosition);
-        intent.putExtra(EXTRA_RECIPE_NAME, viewModel.getRecipeName());
-        startActivity(intent);
+        if (masterViewModel.isTwoPane()) {
+            stepDetailsViewModel.setStepPosition(stepPosition);
+        } else {
+            Intent intent = new Intent(getActivity(), RecipeStepDetailsActivity.class);
+            intent.putParcelableArrayListExtra(EXTRA_STEP_LIST, (ArrayList<? extends Parcelable>) stepsList);
+            intent.putExtra(EXTRA_STEP_POSITION, stepPosition);
+            intent.putExtra(EXTRA_RECIPE_NAME, masterViewModel.getRecipeName());
+            startActivity(intent);
+        }
     }
 }

@@ -11,6 +11,7 @@ public class RecipeDetailsViewModel extends ViewModel {
     private List<Ingredient> ingredientList;
     private List<Step> stepList;
     private String recipeName;
+    private boolean twoPane;
 
     public List<Ingredient> getIngredientList() {
         return ingredientList;
@@ -34,5 +35,13 @@ public class RecipeDetailsViewModel extends ViewModel {
 
     public void setRecipeName(String recipeName) {
         this.recipeName = recipeName;
+    }
+
+    public boolean isTwoPane() {
+        return twoPane;
+    }
+
+    public void setTwoPane(boolean twoPane) {
+        this.twoPane = twoPane;
     }
 }
