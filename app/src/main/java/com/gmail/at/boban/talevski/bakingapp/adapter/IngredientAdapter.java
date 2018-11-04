@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.gmail.at.boban.talevski.bakingapp.R;
 import com.gmail.at.boban.talevski.bakingapp.model.Ingredient;
+import com.gmail.at.boban.talevski.bakingapp.utils.StringUtils;
 
 import java.util.List;
 
@@ -46,19 +47,19 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
     public class IngredientViewHolder extends RecyclerView.ViewHolder{
 
         TextView ingredientTextView;
-        TextView quantityTextView;
 
         public IngredientViewHolder(@NonNull View itemView) {
             super(itemView);
             ingredientTextView = itemView.findViewById(R.id.ingredient_name);
-            quantityTextView = itemView.findViewById(R.id.ingredient_quantity);
         }
 
         public void bind(int position) {
             Ingredient ingredient = ingredientList.get(position);
-            ingredientTextView.setText(ingredient.getIngredient());
-            quantityTextView.setText(context.getString(
-                    R.string.quantity, ingredient.getMeasure(), ingredient.getQuantity()));
+            String ingredientText = context.getString(R.string.ingredient,
+                    StringUtils.capitalizeFirstLetter(ingredient.getIngredient()),
+                    ingredient.getMeasure(),
+                    ingredient.getQuantity());
+            ingredientTextView.setText(ingredientText);
         }
     }
 }

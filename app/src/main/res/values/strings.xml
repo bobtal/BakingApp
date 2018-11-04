@@ -4,7 +4,7 @@
     <string name="ingredients_label">Ingredients:</string>
     <string name="steps_label">Instructions:</string>
 
-    <string name="quantity">%1$s %2$f</string>
+    <string name="ingredient">%1$s - %2$s %3$.2f</string>
     <string name="servings">Servings: %d</string>
 
     <!--Error messages-->
