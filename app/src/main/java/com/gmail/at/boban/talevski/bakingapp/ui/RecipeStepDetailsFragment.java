@@ -74,11 +74,8 @@ public class RecipeStepDetailsFragment extends Fragment {
     }
 
     private void setInstructionText() {
-        String instruction =
-                detailsViewModel.getStepList()
-                        .get(detailsViewModel.getStepPosition().getValue()).getShortDescription() +
-                "\n" + detailsViewModel.getStepList()
-                        .get(detailsViewModel.getStepPosition().getValue()).getDescription();
+        String instruction = detailsViewModel.getStepList()
+                .get(detailsViewModel.getStepPosition().getValue()).getDescription();
         stepInstructions.setText(instruction);
     }
 

@@ -127,8 +127,7 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
     }
 
     private void setInstructionText() {
-        String instruction = viewModel.getStepList().get(viewModel.getStepPosition().getValue()).getShortDescription() +
-                "\n" + viewModel.getStepList().get(viewModel.getStepPosition().getValue()).getDescription();
+        String instruction = viewModel.getStepList().get(viewModel.getStepPosition().getValue()).getDescription();
         stepInstructions.setText(instruction);
     }
 
