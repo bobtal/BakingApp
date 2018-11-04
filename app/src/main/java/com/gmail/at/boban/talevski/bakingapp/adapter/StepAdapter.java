@@ -69,7 +69,10 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
 
         public void bind(int position) {
             if (stepsList.get(position).getThumbnailUrl().isEmpty()) {
+                // add the noimage drawable to the ImageView, but remove it
+                // from the View hierarchy so it doesn't take up screen real estate for no reason
                 recipeStepThumbnail.setImageResource(R.drawable.no_image);
+                recipeStepThumbnail.setVisibility(View.GONE);
             } else {
                 Picasso.get().load(stepsList.get(position).getThumbnailUrl()).into(recipeStepThumbnail);
             }
