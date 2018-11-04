@@ -66,7 +66,8 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
         }
 
         public void bind(int position) {
-            if (stepsList.get(position).getThumbnailUrl().isEmpty()) {
+            if (stepsList.get(position).getThumbnailUrl().isEmpty()
+                    || stepsList.get(position).getThumbnailUrl().endsWith("mp4")) {
                 // add the noimage drawable to the ImageView, but remove it
                 // from the View hierarchy so it doesn't take up screen real estate for no reason
                 recipeStepThumbnail.setImageResource(R.drawable.no_image);
