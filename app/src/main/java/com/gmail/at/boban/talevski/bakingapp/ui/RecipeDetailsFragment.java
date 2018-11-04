@@ -32,9 +32,10 @@ public class RecipeDetailsFragment extends Fragment implements StepAdapter.OnCli
     public static final String EXTRA_RECIPE_NAME =
             "com.gmail.at.boban.talevski.bakingapp.ui.EXTRA_RECIPE_NAME";
 
-    private RecipeDetailsViewModel masterViewModel;
     private RecyclerView ingredientsRecyclerView;
     private RecyclerView stepsRecyclerView;
+
+    private RecipeDetailsViewModel masterViewModel;
     private RecipeStepDetailsViewModel stepDetailsViewModel;
 
     // Mandatory empty constructor
@@ -63,12 +64,28 @@ public class RecipeDetailsFragment extends Fragment implements StepAdapter.OnCli
             stepDetailsViewModel = ViewModelProviders.of(getActivity()).get(RecipeStepDetailsViewModel.class);
         }
 
+        setUpRecyclerViews();
+    }
+
+    private void setUpRecyclerViews() {
         IngredientAdapter ingredientAdapter =
                 new IngredientAdapter(getActivity(), masterViewModel.getIngredientList());
         ingredientsRecyclerView.setAdapter(ingredientAdapter);
         ingredientsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        StepAdapter stepAdapter = new StepAdapter(getActivity(), this, masterViewModel.getStepList());
+        StepAdapter stepAdapter;
+        // Handles single pane/two pane check for appropriate initialization of the step adapter
+        if (masterViewModel.isTwoPane()) {
+            // two pane mode
+            // we need to pass in the respective step position from the stepDetailsViewModel
+            stepAdapter = new StepAdapter(getActivity(),this, masterViewModel.getStepList(),
+                    masterViewModel.isTwoPane(), stepDetailsViewModel.getStepPosition().getValue());
+        } else {
+            // single pane mode
+            // we pass -1 as the last argument to the constructor so that no highlighting happens
+            stepAdapter = new StepAdapter(getActivity(),this, masterViewModel.getStepList(),
+                    masterViewModel.isTwoPane(), -1);
+        }
         stepsRecyclerView.setAdapter(stepAdapter);
         stepsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
