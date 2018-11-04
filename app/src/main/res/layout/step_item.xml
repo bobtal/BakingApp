@@ -39,13 +39,6 @@
                 android:layout_gravity="start"
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Body2" />
 
-            <TextView
-                android:id="@+id/card_recipe_step_long_desc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1" />
-
         </LinearLayout>
 
     </android.support.v7.widget.CardView>
