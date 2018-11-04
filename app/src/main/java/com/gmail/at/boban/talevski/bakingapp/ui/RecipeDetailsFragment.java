@@ -72,7 +72,6 @@ public class RecipeDetailsFragment extends Fragment implements StepAdapter.OnCli
         StepAdapter stepAdapter = new StepAdapter(getActivity(), this, masterViewModel.getStepList());
         stepsRecyclerView.setAdapter(stepAdapter);
         stepsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        stepsRecyclerView.setHasFixedSize(true);
     }
 
     @Override
