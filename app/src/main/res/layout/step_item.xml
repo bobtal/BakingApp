@@ -26,13 +26,6 @@
                 android:contentDescription="@string/recipe_image" />
 
             <TextView
-                android:id="@+id/card_recipe_step_id"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1" />
-
-            <TextView
                 android:id="@+id/card_recipe_step_short_desc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

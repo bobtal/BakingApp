@@ -54,13 +54,11 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
     public class StepViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         ImageView recipeStepThumbnail;
-        TextView recipeStepIdText;
         TextView recipeStepShortDescText;
 
         public StepViewHolder(@NonNull View itemView) {
             super(itemView);
             recipeStepThumbnail = itemView.findViewById(R.id.card_recipe_step_thumbnail);
-            recipeStepIdText = itemView.findViewById(R.id.card_recipe_step_id);
             recipeStepShortDescText = itemView.findViewById(R.id.card_recipe_step_short_desc);
             itemView.setOnClickListener(this);
         }
@@ -75,7 +73,6 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
             } else {
                 Picasso.get().load(stepsList.get(position).getThumbnailUrl()).into(recipeStepThumbnail);
             }
-            recipeStepIdText.setText(String.valueOf(stepsList.get(position).getId()));
             recipeStepShortDescText.setText(stepsList.get(position).getShortDescription());
         }
 
