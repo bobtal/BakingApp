@@ -55,11 +55,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
 
         public void bind(int position) {
             Ingredient ingredient = ingredientList.get(position);
-            String ingredientText = context.getString(R.string.ingredient,
-                    StringUtils.capitalizeFirstLetter(ingredient.getIngredient()),
-                    ingredient.getMeasure(),
-                    ingredient.getQuantity());
-            ingredientTextView.setText(ingredientText);
+            ingredientTextView.setText(ingredient.toString(context));
         }
     }
 }

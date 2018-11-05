@@ -1,8 +1,11 @@
 package com.gmail.at.boban.talevski.bakingapp.model;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.gmail.at.boban.talevski.bakingapp.R;
+import com.gmail.at.boban.talevski.bakingapp.utils.StringUtils;
 import com.google.gson.annotations.Expose;
 
 public class Ingredient implements Parcelable {
@@ -73,5 +76,10 @@ public class Ingredient implements Parcelable {
         parcel.writeFloat(quantity);
         parcel.writeString(measure);
         parcel.writeString(ingredient);
+    }
+
+    public String toString(Context context) {
+        return context.getString(R.string.ingredient,
+                StringUtils.capitalizeFirstLetter(getIngredient()), getMeasure(), getQuantity());
     }
 }
