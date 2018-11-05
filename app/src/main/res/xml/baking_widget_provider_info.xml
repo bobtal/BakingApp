@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:initialKeyguardLayout="@layout/baking_widget"
+    android:initialLayout="@layout/baking_widget"
+    android:minWidth="80dp"
+    android:minHeight="40dp"
+    android:previewImage="@drawable/ic_baking_black_24dp"
+    android:resizeMode="horizontal|vertical"
+    android:updatePeriodMillis="86400000"
+    android:widgetCategory="home_screen"></appwidget-provider>
