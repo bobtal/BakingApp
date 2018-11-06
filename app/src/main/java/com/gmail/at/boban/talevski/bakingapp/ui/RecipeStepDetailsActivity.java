@@ -25,6 +25,10 @@ import java.util.List;
 
 public class RecipeStepDetailsActivity extends AppCompatActivity {
 
+    private static final String EXTRA_PLAYER_IS_PLAYING = "EXTRA_PLAYER_IS_PLAYING";
+    private static final String EXTRA_CURRENT_PLAYER_POSITION = "EXTRA_CURRENT_PLAYER_POSITION";
+    private static final String EXTRA_PLAYER_IS_PLAYING_IN_ON_PAUSE = "EXTRA_PLAYER_IS_PLAYING_IN_ON_PAUSE";
+
     private PlayerView playerView;
     private TextView stepInstructions;
     private Button nextStepButton, previousStepButton;
@@ -33,6 +37,15 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
     private boolean landscape;
 
     private RecipeStepDetailsViewModel viewModel;
+    private boolean isPlaying;
+
+    // separate boolean field to indicate if player was playing in onPause since we don't know
+    // for sure if onSaveInstance state will be called before or after onPause (on anything other than Pie).
+    // And it's a cool challenge to keep the state if we get only to onPause and back to onResume
+    // without going to onStop. Shouldn't happen most of the time though.
+    private boolean isPlayingInOnPause;
+
+    private long currentPlayerPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,9 +56,25 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
         // true if it's a fresh start of activity, not a configuration change (rotation)
         setupViewModel(isFreshStart);
 
+        if (isFreshStart) {
+            // If it's a fresh start, we want the video to play by default
+            isPlaying = true;
+        } else {
+            // otherwise get the values from the savedInstanceState
+            if (savedInstanceState.containsKey(EXTRA_PLAYER_IS_PLAYING) &&
+                    savedInstanceState.containsKey(EXTRA_PLAYER_IS_PLAYING_IN_ON_PAUSE)) {
+                isPlaying = savedInstanceState.getBoolean(EXTRA_PLAYER_IS_PLAYING);
+                isPlayingInOnPause = savedInstanceState.getBoolean(EXTRA_PLAYER_IS_PLAYING_IN_ON_PAUSE);
+
+                // and restore the player position
+                currentPlayerPosition = savedInstanceState.getLong(EXTRA_CURRENT_PLAYER_POSITION);
+            }
+        }
+
         // set title
         getSupportActionBar().setTitle(viewModel.getRecipeName());
 
+        // set up views
         playerView = findViewById(R.id.recipe_step_details_player_view);
         stepInstructions = findViewById(R.id.recipe_step_details_instructions_textview);
         nextStepButton = findViewById(R.id.recipe_step_details_button_next);
@@ -101,8 +130,7 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 viewModel.setStepPosition(viewModel.getStepPosition().getValue() - 1);
-                playerView.getPlayer().stop();
-                updateUI();
+                updateUIAfterButtonClick();
             }
         });
 
@@ -110,18 +138,24 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 viewModel.setStepPosition(viewModel.getStepPosition().getValue() + 1);
-                playerView.getPlayer().stop();
-                updateUI();
+                updateUIAfterButtonClick();
             }
         });
     }
 
-    private void updateUI() {
-        // updates the UI after a button click (prev/next)
+    private void updateUIAfterButtonClick() {
+        // stop the currently playing video
+        playerView.getPlayer().stop();
+
+        // set up isPlaying to true cause we want the newly selected video to start playing
+        isPlaying = true;
+
+        // refresh the UI
         if (!landscape) {
             // set this only if we are not in landscape mode
             setInstructionText();
         }
+        // setup the new video and play it
         setupPlayerMediaSource();
         setButtonVisibility();
     }
@@ -132,17 +166,20 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
     }
 
     private void setupPlayerMediaSource() {
-        // Produces DataSource instances through which media data is loaded.
+        // produces DataSource instances through which media data is loaded.
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this,
                 Util.getUserAgent(this, getString(R.string.app_name)));
-        // This is the MediaSource representing the media to be played.
+        // this is the MediaSource representing the media to be played.
         MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
                 .createMediaSource(Uri.parse(viewModel.getStepList().get(viewModel.getStepPosition().getValue()).getVideoUrl()));
-        // Prepare the player with the source.
+        // prepare the player with the source.
         player.prepare(videoSource);
 
-        // Start playing the sample
-        player.setPlayWhenReady(true);
+        // seek to the specified position
+        player.seekTo(currentPlayerPosition);
+
+        // start playing the sample depending on the value of isPlaying
+        player.setPlayWhenReady(isPlaying);
     }
 
     private void setButtonVisibility() {
@@ -162,6 +199,40 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
             // been removed if the user was at the last step at some point
             nextStepButton.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // get current player status
+        isPlaying = playerView.getPlayer().getPlayWhenReady();
+
+        // put both booleans in the outState, we don't know if this method or onPause is called first
+        // if we need to start playing in onResume, at least one of these will be true
+        // if we need to keep the player paused in onResume, both will be false
+        outState.putBoolean(EXTRA_PLAYER_IS_PLAYING, isPlaying);
+        outState.putBoolean(EXTRA_PLAYER_IS_PLAYING_IN_ON_PAUSE, isPlayingInOnPause);
+
+        currentPlayerPosition = playerView.getPlayer().getCurrentPosition();
+        outState.putLong(EXTRA_CURRENT_PLAYER_POSITION, currentPlayerPosition);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // get current player status
+        isPlayingInOnPause = playerView.getPlayer().getPlayWhenReady();
+        // pause the player
+        playerView.getPlayer().setPlayWhenReady(false);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Since we don't know if we are resuming from a paused or stopped
+        // activity state (or it's a fresh start altogether),
+        // we check if either of isPlaying booleans is true to set current playing status to true
+        playerView.getPlayer().setPlayWhenReady(isPlaying || isPlayingInOnPause);
     }
 
     @Override
