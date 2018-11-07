@@ -105,8 +105,12 @@ public class RecipeDetailsFragment extends Fragment implements StepAdapter.OnCli
     @Override
     public void onListItemClick(List<Step> stepsList, int stepPosition) {
         if (masterViewModel.isTwoPane()) {
+            // update step position in the viewmodel if we are in twoPane mode
+            // it's observed in RecipeStepDetailsFragment to populate the fragment with appropriate data
             stepDetailsViewModel.setStepPosition(stepPosition);
         } else {
+            // if not in twoPane mode launch the RecipeStepDetailsActivity
+            // with appropriate data
             Intent intent = new Intent(getActivity(), RecipeStepDetailsActivity.class);
             intent.putParcelableArrayListExtra(EXTRA_STEP_LIST, (ArrayList<? extends Parcelable>) stepsList);
             intent.putExtra(EXTRA_STEP_POSITION, stepPosition);
