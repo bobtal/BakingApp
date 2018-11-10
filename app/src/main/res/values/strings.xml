@@ -10,6 +10,9 @@
     <!--Error messages-->
     <string name="no_internet">Can\'t fetch data, no Internet connectivity</string>
 
+    <!--Placeholder text for the widget while no recipe is yet viewed by the user-->
+    <string name="no_recipe_viewed">No recipe viewed</string>
+
     <!--Content descriptions-->
     <string name="recipe_image">Recipe Image</string>
 

@@ -1,8 +1,6 @@
 package com.gmail.at.boban.talevski.bakingapp.ui;
 
-import android.appwidget.AppWidgetManager;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -21,7 +19,6 @@ import com.gmail.at.boban.talevski.bakingapp.adapter.StepAdapter;
 import com.gmail.at.boban.talevski.bakingapp.model.Step;
 import com.gmail.at.boban.talevski.bakingapp.viewmodel.RecipeDetailsViewModel;
 import com.gmail.at.boban.talevski.bakingapp.viewmodel.RecipeStepDetailsViewModel;
-import com.gmail.at.boban.talevski.bakingapp.widget.BakingWidgetProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,13 +74,6 @@ public class RecipeDetailsFragment extends Fragment implements StepAdapter.OnCli
                 new IngredientAdapter(getActivity(), masterViewModel.getIngredientList());
         ingredientsRecyclerView.setAdapter(ingredientAdapter);
         ingredientsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-        // Update the widget to show the ingredients of the last viewed recipe
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getActivity());
-        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(
-                new ComponentName(getActivity(), BakingWidgetProvider.class));
-        BakingWidgetProvider.updateBakingWidgets(getActivity(), appWidgetManager, appWidgetIds,
-                masterViewModel.getIngredientList(), masterViewModel.getRecipeName());
 
         StepAdapter stepAdapter;
         // Handles single pane/two pane check for appropriate initialization of the step adapter

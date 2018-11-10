@@ -2,25 +2,25 @@ package com.gmail.at.boban.talevski.bakingapp.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
+import android.content.SharedPreferences;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import com.gmail.at.boban.talevski.bakingapp.R;
-import com.gmail.at.boban.talevski.bakingapp.model.Ingredient;
-import com.gmail.at.boban.talevski.bakingapp.ui.RecipeDetailsFragment;
+import com.gmail.at.boban.talevski.bakingapp.ui.RecipeDetailsActivity;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class ListWidgetService extends RemoteViewsService {
 
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
-        Bundle bundle = intent.getExtras();
-        ArrayList<Ingredient> ingredientList =
-                bundle.getParcelableArrayList(RecipeDetailsFragment.EXTRA_INGREDIENT_LIST);
-        return new ListRemoteViewsFactory(this.getApplicationContext(), ingredientList);
+        return new ListRemoteViewsFactory(this.getApplicationContext());
     }
 }
 
@@ -28,21 +28,27 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     private static final String TAG = ListRemoteViewsFactory.class.getSimpleName();
 
     private Context context;
-    private ArrayList<Ingredient> ingredientList;
+    private List<String> ingredientList;
 
-    public ListRemoteViewsFactory(Context context, ArrayList<Ingredient> ingredientList) {
+    public ListRemoteViewsFactory(Context context) {
         this.context = context;
-        this.ingredientList = ingredientList;
     }
 
     @Override
     public void onCreate() {
-
+        // Grab the set of ingredients from shared preferences as a Set<String> and convert it
+        // to a List<String>
+        SharedPreferences preferences =
+                context.getSharedPreferences(RecipeDetailsActivity.PREFS_FILE, MODE_PRIVATE);
+        Set<String> ingredientSet = preferences.getStringSet(RecipeDetailsActivity.KEY_INGREDIENTS_SET, new HashSet<>());
+        ingredientList = new ArrayList<>(ingredientSet);
     }
 
     @Override
     public void onDataSetChanged() {
-
+        // just do the same thing from onCreate to reinitialize ingredientList to
+        // the current data found in shared preferences
+        onCreate();
     }
 
     @Override
@@ -58,7 +64,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     @Override
     public RemoteViews getViewAt(int i) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_list_item);
-        views.setTextViewText(R.id.widget_list_text, ingredientList.get(i).toString(context));
+        views.setTextViewText(R.id.widget_list_text, ingredientList.get(i));
         return views;
     }
 

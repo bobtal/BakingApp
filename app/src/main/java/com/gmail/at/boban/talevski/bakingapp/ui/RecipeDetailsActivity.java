@@ -1,21 +1,32 @@
 package com.gmail.at.boban.talevski.bakingapp.ui;
 
+import android.appwidget.AppWidgetManager;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.FrameLayout;
 
 import com.gmail.at.boban.talevski.bakingapp.R;
+import com.gmail.at.boban.talevski.bakingapp.model.Ingredient;
 import com.gmail.at.boban.talevski.bakingapp.model.Recipe;
 import com.gmail.at.boban.talevski.bakingapp.model.Step;
 import com.gmail.at.boban.talevski.bakingapp.viewmodel.RecipeDetailsViewModel;
 import com.gmail.at.boban.talevski.bakingapp.viewmodel.RecipeStepDetailsViewModel;
+import com.gmail.at.boban.talevski.bakingapp.widget.BakingWidgetProvider;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class RecipeDetailsActivity extends AppCompatActivity {
+
+    public static final String PREFS_FILE = "com.gmail.at.boban.talevski.bakingapp.ui.preferences";
+    public static final String KEY_RECIPE_NAME = "KEY_RECIPE_NAME";
+    public static final String KEY_INGREDIENTS_SET = "KEY_INGREDIENTS_SET";
 
     RecipeDetailsViewModel masterViewModel;
     private boolean twoPane;
@@ -58,6 +69,8 @@ public class RecipeDetailsActivity extends AppCompatActivity {
                 masterViewModel.setRecipeName(recipe.getName());
                 masterViewModel.setTwoPane(twoPane);
 
+                putRecipeDetailsInSharedPref();
+
                 if (twoPane) {
                     // set up another viewmodel to be used by the (step)details fragment
                     RecipeStepDetailsViewModel detailsViewModel =
@@ -88,5 +101,29 @@ public class RecipeDetailsActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    // puts the last seen recipe details in shared preferences to be accessed by the widget
+    // and update the widget
+    private void putRecipeDetailsInSharedPref() {
+        Set<String> ingredientSet = new HashSet<>();
+        List<Ingredient> ingredientList = masterViewModel.getIngredientList();
+        // adds string interpretation of each ingredient to a set of String ingredients
+        ingredientList.forEach(ingredient -> ingredientSet.add(ingredient.toString(this)));
+
+        // Store the
+        SharedPreferences preferences = getSharedPreferences(PREFS_FILE, MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(KEY_RECIPE_NAME, masterViewModel.getRecipeName());
+        editor.putStringSet(KEY_INGREDIENTS_SET, ingredientSet);
+        editor.apply();
+
+        // Update the widget to show the ingredients of the last viewed recipe
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
+        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(
+                new ComponentName(this, BakingWidgetProvider.class));
+        BakingWidgetProvider.updateBakingWidgets(
+                this, appWidgetManager, appWidgetIds);
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_list);
     }
 }

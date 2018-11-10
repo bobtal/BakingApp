@@ -5,19 +5,16 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.os.Parcelable;
+import android.content.SharedPreferences;
 import android.widget.RemoteViews;
 
 import com.gmail.at.boban.talevski.bakingapp.R;
 import com.gmail.at.boban.talevski.bakingapp.adapter.ListWidgetService;
-import com.gmail.at.boban.talevski.bakingapp.model.Ingredient;
 import com.gmail.at.boban.talevski.bakingapp.ui.MainActivity;
+import com.gmail.at.boban.talevski.bakingapp.ui.RecipeDetailsActivity;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.gmail.at.boban.talevski.bakingapp.ui.RecipeDetailsFragment.EXTRA_INGREDIENT_LIST;
+import static android.content.Context.MODE_PRIVATE;
+import static com.gmail.at.boban.talevski.bakingapp.ui.RecipeDetailsActivity.KEY_RECIPE_NAME;
 
 /**
  * Implementation of App Widget functionality.
@@ -25,7 +22,7 @@ import static com.gmail.at.boban.talevski.bakingapp.ui.RecipeDetailsFragment.EXT
 public class BakingWidgetProvider extends AppWidgetProvider {
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-                                int appWidgetId, List<Ingredient> ingredientList, String recipeName) {
+                                int appWidgetId) {
 
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.baking_widget);
@@ -34,18 +31,18 @@ public class BakingWidgetProvider extends AppWidgetProvider {
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
+        // Grab the recipe name from shared preferences and set it to the text view in the widget
+        SharedPreferences preferences =
+                context.getSharedPreferences(RecipeDetailsActivity.PREFS_FILE, MODE_PRIVATE);
+        String recipeName = preferences.getString(KEY_RECIPE_NAME, context.getString(R.string.no_recipe_viewed));
+        views.setTextViewText(R.id.widget_recipe_name, recipeName);
+
         // Set the adapter to the listview
         Intent adapterIntent = new Intent(context, ListWidgetService.class);
-        Bundle bundle = new Bundle();
-        bundle.putParcelableArrayList(EXTRA_INGREDIENT_LIST, (ArrayList<? extends Parcelable>) ingredientList);
-        adapterIntent.putExtras(bundle);
         views.setRemoteAdapter(R.id.widget_list, adapterIntent);
 
         // Set the click handler on the listview to open the app
         views.setOnClickPendingIntent(R.id.widget_root_linear_layout, pendingIntent);
-
-        // set recipe name to the text view in the widget
-        views.setTextViewText(R.id.widget_recipe_name, recipeName);
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
@@ -53,13 +50,17 @@ public class BakingWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        // do nothing as updates are only triggered when the user sees a recipe in the app
+        // just call updateBakingWidgets which is triggered for a manual update when the
+        // user opens a recipe
+        // there are no automatic updates required since the state is saved in shared preferences
+        // and when it changes, a manual update is triggered by calling updateBakingWidgets
+        BakingWidgetProvider.updateBakingWidgets(context, appWidgetManager, appWidgetIds);
     }
 
-    public static void updateBakingWidgets(Context context, AppWidgetManager appWidgetManager,
-                                           int[] appWidgetIds, List<Ingredient> ingredientList, String recipeName) {
+    public static void updateBakingWidgets(
+            Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         for (int appWidgetId : appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId, ingredientList, recipeName);
+            updateAppWidget(context, appWidgetManager, appWidgetId);
         }
     }
 
