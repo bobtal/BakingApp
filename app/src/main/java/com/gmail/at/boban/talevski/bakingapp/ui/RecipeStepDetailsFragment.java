@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gmail.at.boban.talevski.bakingapp.R;
@@ -33,6 +34,7 @@ public class RecipeStepDetailsFragment extends Fragment {
     private PlayerView playerView;
     private TextView stepInstructions;
     private SimpleExoPlayer player;
+    private ImageView noVideoImageView;
 
     // variables to keep player state
     private boolean isPlaying;
@@ -59,6 +61,7 @@ public class RecipeStepDetailsFragment extends Fragment {
         View view = inflater.inflate(R.layout.recipe_step_details_fragment, container, false);
         playerView = view.findViewById(R.id.recipe_step_details_player_view);
         stepInstructions = view.findViewById(R.id.recipe_step_details_instructions_textview);
+        noVideoImageView = view.findViewById(R.id.recipe_step_details_no_video_imageview);
 
         return view;
     }
@@ -130,18 +133,31 @@ public class RecipeStepDetailsFragment extends Fragment {
         // Produces DataSource instances through which media data is loaded.
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getActivity(),
                 Util.getUserAgent(getActivity(), getString(R.string.app_name)));
-        // This is the MediaSource representing the media to be played.
-        MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(Uri.parse(detailsViewModel.getStepList()
-                        .get(detailsViewModel.getStepPosition().getValue()).getVideoUrl()));
-        // Prepare the player with the source.
-        player.prepare(videoSource);
 
-        // seek to the specified position
-        player.seekTo(currentPlayerPosition);
+        String videoUrl = detailsViewModel.getStepList()
+                .get(detailsViewModel.getStepPosition().getValue()).getVideoUrl();
 
-        // Start playing the sample
-        player.setPlayWhenReady(isPlaying);
+        if (videoUrl == null || videoUrl.isEmpty()) {
+            // hide the player and show the no video image
+            playerView.setVisibility(View.GONE);
+            noVideoImageView.setVisibility(View.VISIBLE);
+        } else {
+            // show and set up the player
+            playerView.setVisibility(View.VISIBLE);
+            noVideoImageView.setVisibility(View.GONE);
+
+            // This is the MediaSource representing the media to be played.
+            MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
+                    .createMediaSource(Uri.parse(videoUrl));
+            // Prepare the player with the source.
+            player.prepare(videoSource);
+
+            // seek to the specified position
+            player.seekTo(currentPlayerPosition);
+
+            // Start playing the sample
+            player.setPlayWhenReady(isPlaying);
+        }
     }
 
     @Override

@@ -14,6 +14,7 @@
     <string name="no_recipe_viewed">No recipe viewed</string>
 
     <!--Content descriptions-->
-    <string name="recipe_image">Recipe Image</string>
+    <string name="recipe_image">Recipe image</string>
+    <string name="no_video_placeholder_image">No video placeholder image</string>
 
 </resources>

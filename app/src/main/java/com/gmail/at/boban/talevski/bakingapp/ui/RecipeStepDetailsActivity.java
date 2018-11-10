@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gmail.at.boban.talevski.bakingapp.R;
@@ -33,6 +34,7 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
     private TextView stepInstructions;
     private Button nextStepButton, previousStepButton;
     private SimpleExoPlayer player;
+    private ImageView noVideoImageView;
 
     private boolean landscape;
 
@@ -79,6 +81,7 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
         stepInstructions = findViewById(R.id.recipe_step_details_instructions_textview);
         nextStepButton = findViewById(R.id.recipe_step_details_button_next);
         previousStepButton = findViewById(R.id.recipe_step_details_button_previous);
+        noVideoImageView = findViewById(R.id.recipe_step_details_no_video_imageview);
 
         if (stepInstructions == null) {
             // step instructions view is not present in the landscape layout
@@ -169,17 +172,30 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
         // produces DataSource instances through which media data is loaded.
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this,
                 Util.getUserAgent(this, getString(R.string.app_name)));
-        // this is the MediaSource representing the media to be played.
-        MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(Uri.parse(viewModel.getStepList().get(viewModel.getStepPosition().getValue()).getVideoUrl()));
-        // prepare the player with the source.
-        player.prepare(videoSource);
 
-        // seek to the specified position
-        player.seekTo(currentPlayerPosition);
+        String videoUrl = viewModel.getStepList().get(viewModel.getStepPosition().getValue()).getVideoUrl();
 
-        // start playing the sample depending on the value of isPlaying
-        player.setPlayWhenReady(isPlaying);
+        if (videoUrl == null || videoUrl.isEmpty()) {
+            // hide the player and show the no video image
+            playerView.setVisibility(View.GONE);
+            noVideoImageView.setVisibility(View.VISIBLE);
+        } else {
+            // show and set up the player
+            playerView.setVisibility(View.VISIBLE);
+            noVideoImageView.setVisibility(View.GONE);
+
+            // this is the MediaSource representing the media to be played.
+            MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
+                    .createMediaSource(Uri.parse(videoUrl));
+            // prepare the player with the source.
+            player.prepare(videoSource);
+
+            // seek to the specified position
+            player.seekTo(currentPlayerPosition);
+
+            // start playing the sample depending on the value of isPlaying
+            player.setPlayWhenReady(isPlaying);
+        }
     }
 
     private void setButtonVisibility() {

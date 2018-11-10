@@ -7,12 +7,28 @@
     android:orientation="vertical"
     tools:context=".ui.RecipeStepDetailsFragment">
 
-    <com.google.android.exoplayer2.ui.PlayerView
-        android:id="@+id/recipe_step_details_player_view"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_margin="8dp"
         android:layout_height="0dp"
-        android:layout_weight="5" />
+        android:layout_weight="5"
+        android:layout_margin="8dp">
+
+        <com.google.android.exoplayer2.ui.PlayerView
+            android:id="@+id/recipe_step_details_player_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <ImageView
+            android:id="@+id/recipe_step_details_no_video_imageview"
+            android:contentDescription="@string/no_video_placeholder_image"
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:paddingStart="80dp"
+            android:paddingEnd="80dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/no_video"/>
+
+    </FrameLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
