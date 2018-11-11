@@ -18,6 +18,7 @@ import android.widget.ProgressBar;
 import com.gmail.at.boban.talevski.bakingapp.R;
 import com.gmail.at.boban.talevski.bakingapp.adapter.RecipeAdapter;
 import com.gmail.at.boban.talevski.bakingapp.model.Recipe;
+import com.gmail.at.boban.talevski.bakingapp.utils.EspressoIdlingResource;
 import com.gmail.at.boban.talevski.bakingapp.viewmodel.RecipeListViewModel;
 
 import java.util.List;
@@ -56,6 +57,9 @@ public class RecipeListFragment extends Fragment implements RecipeAdapter.OnList
     }
 
     private void setupViewModel() {
+        // increment idling resource to tell Espresso to wait
+        EspressoIdlingResource.increment();
+
         showProgressBar();
         viewModel.getRecipes().observe(this, new Observer<List<Recipe>>() {
             @Override
@@ -73,6 +77,9 @@ public class RecipeListFragment extends Fragment implements RecipeAdapter.OnList
         recipeRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), numberOfColumns));
         recipeRecyclerView.setHasFixedSize(true);
         hideProgressBar();
+
+        // decrement idling resource to tell Espresso that data loading has been done
+        EspressoIdlingResource.decrement();
     }
 
     private void hideProgressBar() {
