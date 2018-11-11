@@ -7,7 +7,9 @@
     <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/recipe_step_details_player_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        app:fastforward_increment="1000"
+        app:rewind_increment="1000"/>
 
     <ImageView
         android:id="@+id/recipe_step_details_no_video_imageview"
