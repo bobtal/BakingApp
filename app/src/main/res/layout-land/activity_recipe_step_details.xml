@@ -13,20 +13,7 @@
         android:layout_weight="5"
         android:layout_margin="8dp">
 
-        <com.google.android.exoplayer2.ui.PlayerView
-            android:id="@+id/recipe_step_details_player_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-        <ImageView
-            android:id="@+id/recipe_step_details_no_video_imageview"
-            android:contentDescription="@string/no_video_placeholder_image"
-            android:layout_width="match_parent"
-            android:layout_height="350dp"
-            android:paddingStart="80dp"
-            android:paddingEnd="80dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/no_video"/>
+        <include layout="@layout/exo_player_view_and_no_video_image_view" />
 
     </FrameLayout>
 
