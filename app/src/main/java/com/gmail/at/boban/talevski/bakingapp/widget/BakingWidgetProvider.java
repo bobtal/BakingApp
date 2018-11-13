@@ -5,16 +5,12 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.widget.RemoteViews;
 
 import com.gmail.at.boban.talevski.bakingapp.R;
 import com.gmail.at.boban.talevski.bakingapp.adapter.ListWidgetService;
 import com.gmail.at.boban.talevski.bakingapp.ui.MainActivity;
-import com.gmail.at.boban.talevski.bakingapp.ui.RecipeDetailsActivity;
-
-import static android.content.Context.MODE_PRIVATE;
-import static com.gmail.at.boban.talevski.bakingapp.ui.RecipeDetailsActivity.KEY_RECIPE_NAME;
+import com.gmail.at.boban.talevski.bakingapp.utils.SharedPreferencesUtils;
 
 /**
  * Implementation of App Widget functionality.
@@ -32,9 +28,7 @@ public class BakingWidgetProvider extends AppWidgetProvider {
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
         // Grab the recipe name from shared preferences and set it to the text view in the widget
-        SharedPreferences preferences =
-                context.getSharedPreferences(RecipeDetailsActivity.PREFS_FILE, MODE_PRIVATE);
-        String recipeName = preferences.getString(KEY_RECIPE_NAME, context.getString(R.string.no_recipe_viewed));
+        String recipeName = SharedPreferencesUtils.getRecipeNameFromSharedPreferences(context);
         views.setTextViewText(R.id.widget_recipe_name, recipeName);
 
         // Set the adapter to the listview

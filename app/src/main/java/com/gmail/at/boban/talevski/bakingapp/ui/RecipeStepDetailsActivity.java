@@ -11,7 +11,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gmail.at.boban.talevski.bakingapp.R;
+import com.gmail.at.boban.talevski.bakingapp.model.Recipe;
 import com.gmail.at.boban.talevski.bakingapp.model.Step;
+import com.gmail.at.boban.talevski.bakingapp.utils.SharedPreferencesUtils;
 import com.gmail.at.boban.talevski.bakingapp.viewmodel.RecipeStepDetailsViewModel;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -104,10 +106,6 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
         viewModel = ViewModelProviders.of(this).get(RecipeStepDetailsViewModel.class);
 
         // if it's a fresh activity start, acquire data from the intent to set it up in the viewmodel
-        // otherwise do nothing, as the viewmodel is already filled with data
-        // which might have already changed
-        // step position mostly, it could've been changed by clicking next/prev buttons
-        // and the update is already recorded in the viewmodel
         if (isFreshStart) {
             Intent intent = getIntent();
             if (intent != null && intent.hasExtra(RecipeDetailsFragment.EXTRA_STEP_LIST) &&
@@ -119,7 +117,23 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
                 viewModel.setStepList(steps);
                 viewModel.setStepPosition(stepPosition);
                 viewModel.setRecipeName(recipeName);
+
+                // update whatever step was chosen on fresh start of activity to shared preferences
+                // to keep the app state up to date
+                SharedPreferencesUtils.putStepPositionInSharedPreferences(this, stepPosition);
             }
+        } else {
+            // not a fresh start, so check whether the viewmodel is populated with data - it was a rotation,
+            // or it was a restart after process was in the background and being killed by the system
+            if (viewModel.getRecipeName() == null || viewModel.getRecipeName().isEmpty()) {
+                // viewmodel doesn't have any data, so need to populate it using the
+                // recipe object stored as JSON in shared preferences. It's the last open recipe
+                Recipe recipe = SharedPreferencesUtils.getRecipeFromSharedPreferences(this);
+                viewModel.setStepList(recipe.getSteps());
+                viewModel.setRecipeName(recipe.getName());
+
+                viewModel.setStepPosition(SharedPreferencesUtils.getStepPositionFromSharedPreferences(this));
+            } // it's a configuration change and the viewmodel is alive and well so do nothing
         }
     }
 
@@ -132,7 +146,13 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
         previousStepButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                viewModel.setStepPosition(viewModel.getStepPosition().getValue() - 1);
+                int newStepPosition = viewModel.getStepPosition().getValue() - 1;
+                // update the new step position in viewmodel
+                viewModel.setStepPosition(newStepPosition);
+                // update the new step position in shared preferences
+                SharedPreferencesUtils.putStepPositionInSharedPreferences(
+                        RecipeStepDetailsActivity.this,
+                        newStepPosition);
                 updateUIAfterButtonClick();
             }
         });
@@ -140,7 +160,13 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
         nextStepButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                viewModel.setStepPosition(viewModel.getStepPosition().getValue() + 1);
+                int newStepPosition = viewModel.getStepPosition().getValue() + 1;
+                // update the new step position in viewmodel
+                viewModel.setStepPosition(newStepPosition);
+                // update the new step position in shared preferences
+                SharedPreferencesUtils.putStepPositionInSharedPreferences(
+                        RecipeStepDetailsActivity.this,
+                        newStepPosition);
                 updateUIAfterButtonClick();
             }
         });
@@ -150,8 +176,10 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
         // stop the currently playing video
         playerView.getPlayer().stop();
 
-        // set up isPlaying to true cause we want the newly selected video to start playing
+        // set up isPlaying to true and position to 0 since we
+        // want the newly selected video to start playing from the beginning
         isPlaying = true;
+        currentPlayerPosition = 0;
 
         // refresh the UI
         if (!landscape) {

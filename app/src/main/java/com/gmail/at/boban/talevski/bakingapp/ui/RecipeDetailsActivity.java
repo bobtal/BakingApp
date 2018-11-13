@@ -4,29 +4,24 @@ import android.appwidget.AppWidgetManager;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ComponentName;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.FrameLayout;
 
 import com.gmail.at.boban.talevski.bakingapp.R;
-import com.gmail.at.boban.talevski.bakingapp.model.Ingredient;
 import com.gmail.at.boban.talevski.bakingapp.model.Recipe;
 import com.gmail.at.boban.talevski.bakingapp.model.Step;
+import com.gmail.at.boban.talevski.bakingapp.utils.SharedPreferencesUtils;
 import com.gmail.at.boban.talevski.bakingapp.viewmodel.RecipeDetailsViewModel;
 import com.gmail.at.boban.talevski.bakingapp.viewmodel.RecipeStepDetailsViewModel;
 import com.gmail.at.boban.talevski.bakingapp.widget.BakingWidgetProvider;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class RecipeDetailsActivity extends AppCompatActivity {
 
-    public static final String PREFS_FILE = "com.gmail.at.boban.talevski.bakingapp.ui.preferences";
-    public static final String KEY_RECIPE_NAME = "KEY_RECIPE_NAME";
-    public static final String KEY_INGREDIENTS_SET = "KEY_INGREDIENTS_SET";
+    private static final String TAG = RecipeDetailsActivity.class.getSimpleName();
 
     RecipeDetailsViewModel masterViewModel;
     private boolean twoPane;
@@ -53,72 +48,71 @@ public class RecipeDetailsActivity extends AppCompatActivity {
         // registers the viewmodel in any case
         masterViewModel = ViewModelProviders.of(this).get(RecipeDetailsViewModel.class);
 
-        // if it's a fresh activity start, acquire data from the intent to set it up in the viewmodel
-        // and add the fragment if it's in twoPane mode
-        // otherwise do nothing, as the viewmodel is already filled with data
-        // which might have already changed.
-        // Step position mostly, it could've been changed by clicking on other steps in the master
-        // pane and the update is already recorded in the (step) details viewmodel, we don't want
-        // it to default to zero on rotation
+        // Declare a recipe object which will be used to fill in the UI.
+        Recipe recipe;
+
+        // if it's a fresh activity start, acquire the recipe object from the intent
+        // and use it to populate the viewmodel
         if (isFreshStart) {
             Intent intent = getIntent();
-            if (intent != null && intent.hasExtra(RecipeListFragment.EXTRA_RECIPE)) {
-                Recipe recipe = intent.getParcelableExtra(RecipeListFragment.EXTRA_RECIPE);
-                masterViewModel.setIngredientList(recipe.getIngredients());
-                masterViewModel.setStepList(recipe.getSteps());
-                masterViewModel.setRecipeName(recipe.getName());
-                masterViewModel.setTwoPane(twoPane);
+            recipe = intent.getParcelableExtra(RecipeListFragment.EXTRA_RECIPE);
+            populateViewModelWithData(recipe);
 
-                putRecipeDetailsInSharedPref();
+            // add/update the data in shared preferences on fresh activity start to store
+            // both the data needed for the widget and the recipe object needed for an app restart
+            SharedPreferencesUtils.putRecipeObjectInSharedPrefAsJson(this, recipe);
+            SharedPreferencesUtils.putRecipeDetailsInSharedPrefForWidget(
+                    this, masterViewModel.getIngredientList(), masterViewModel.getRecipeName());
+            updateWidget();
+        } else {
+            // not a fresh start, so check whether the viewmodel is populated with data - it was a rotation,
+            // or it was a restart after process was in the background and being killed by the system
+            if (masterViewModel.getRecipeName() == null || masterViewModel.getRecipeName().isEmpty()) {
+                // viewmodel doesn't have any data, so need to populate it with the
+                // recipe object stored as JSON in shared preferences
+                recipe = SharedPreferencesUtils.getRecipeFromSharedPreferences(this);
+                populateViewModelWithData(recipe);
+            } // it's a configuration change and the viewmodel is alive and well so do nothing
+        }
 
-                if (twoPane) {
-                    // set up another viewmodel to be used by the (step)details fragment
-                    RecipeStepDetailsViewModel detailsViewModel =
-                            ViewModelProviders.of(this).get(RecipeStepDetailsViewModel.class);
+        // add the fragment if it's in twoPane mode
+        if (twoPane) {
+            // set up another viewmodel to be used by the (step)details fragment
+            RecipeStepDetailsViewModel detailsViewModel = ViewModelProviders.of(this).get(RecipeStepDetailsViewModel.class);
 
-                    // On initial activity start use the information in the master viewmodel to populate
-                    // the data in the (step) details view model
-                    List<Step> steps = masterViewModel.getStepList();
-                    int stepPosition = 0; // default at the first step of the recipe
-                    String recipeName = masterViewModel.getRecipeName();
-                    detailsViewModel.setStepList(steps);
-                    detailsViewModel.setStepPosition(stepPosition);
-                    detailsViewModel.setRecipeName(recipeName);
+            // use the information in the master viewmodel to populate
+            // the data in the (step) details view model
+            List<Step> steps = masterViewModel.getStepList();
+            String recipeName = masterViewModel.getRecipeName();
+            detailsViewModel.setStepList(steps);
+            detailsViewModel.setRecipeName(recipeName);
 
-                    // add the (step) details fragment if it's not already added
-                    FragmentManager fragmentManager = getSupportFragmentManager();
-                    RecipeStepDetailsFragment savedFragment = (RecipeStepDetailsFragment) fragmentManager
-                            .findFragmentById(R.id.recipe_step_details_container);
+            // set step position to 0 if it's a fresh start, otherwise, get it from shared preferences
+            int stepPosition = isFreshStart ? 0 :
+                    SharedPreferencesUtils.getStepPositionFromSharedPreferences(this);
+            detailsViewModel.setStepPosition(stepPosition);
 
-                    // This check is likely not needed since we check if it's a fresh start
-                    // of the activity and the fragment shouldn't be present if we get to this part
-                    // of the code. Still, better safe than sorry.
-                    if (savedFragment == null) {
-                        getSupportFragmentManager().beginTransaction()
-                                .add(R.id.recipe_step_details_container, new RecipeStepDetailsFragment())
-                                .commit();
-                    }
-                }
+            // add the (step) details fragment if it's not already added
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            RecipeStepDetailsFragment savedFragment = (RecipeStepDetailsFragment) fragmentManager
+                    .findFragmentById(R.id.recipe_step_details_container);
+            if (savedFragment == null) {
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.recipe_step_details_container, new RecipeStepDetailsFragment())
+                        .commit();
+
             }
         }
     }
 
-    // puts the last seen recipe details in shared preferences to be accessed by the widget
-    // and update the widget
-    private void putRecipeDetailsInSharedPref() {
-        Set<String> ingredientSet = new HashSet<>();
-        List<Ingredient> ingredientList = masterViewModel.getIngredientList();
-        // adds string interpretation of each ingredient to a set of String ingredients
-        ingredientList.forEach(ingredient -> ingredientSet.add(ingredient.toString(this)));
+    private void populateViewModelWithData(Recipe recipe) {
+        masterViewModel.setIngredientList(recipe.getIngredients());
+        masterViewModel.setStepList(recipe.getSteps());
+        masterViewModel.setRecipeName(recipe.getName());
+        masterViewModel.setTwoPane(twoPane);
+    }
 
-        // Store the
-        SharedPreferences preferences = getSharedPreferences(PREFS_FILE, MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(KEY_RECIPE_NAME, masterViewModel.getRecipeName());
-        editor.putStringSet(KEY_INGREDIENTS_SET, ingredientSet);
-        editor.apply();
-
-        // Update the widget to show the ingredients of the last viewed recipe
+    private void updateWidget() {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(
                 new ComponentName(this, BakingWidgetProvider.class));
@@ -126,4 +120,5 @@ public class RecipeDetailsActivity extends AppCompatActivity {
                 this, appWidgetManager, appWidgetIds);
         appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_list);
     }
+
 }

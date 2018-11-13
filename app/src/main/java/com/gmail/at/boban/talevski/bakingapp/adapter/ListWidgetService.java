@@ -2,19 +2,15 @@ package com.gmail.at.boban.talevski.bakingapp.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import com.gmail.at.boban.talevski.bakingapp.R;
-import com.gmail.at.boban.talevski.bakingapp.ui.RecipeDetailsActivity;
+import com.gmail.at.boban.talevski.bakingapp.utils.SharedPreferencesUtils;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static android.content.Context.MODE_PRIVATE;
 
 public class ListWidgetService extends RemoteViewsService {
 
@@ -38,9 +34,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     public void onCreate() {
         // Grab the set of ingredients from shared preferences as a Set<String> and convert it
         // to a List<String>
-        SharedPreferences preferences =
-                context.getSharedPreferences(RecipeDetailsActivity.PREFS_FILE, MODE_PRIVATE);
-        Set<String> ingredientSet = preferences.getStringSet(RecipeDetailsActivity.KEY_INGREDIENTS_SET, new HashSet<>());
+        Set<String> ingredientSet = SharedPreferencesUtils.getIngredientSetFromSharedPreferences(context);
         ingredientList = new ArrayList<>(ingredientSet);
     }
 

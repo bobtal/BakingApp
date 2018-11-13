@@ -17,6 +17,7 @@ import com.gmail.at.boban.talevski.bakingapp.R;
 import com.gmail.at.boban.talevski.bakingapp.adapter.IngredientAdapter;
 import com.gmail.at.boban.talevski.bakingapp.adapter.StepAdapter;
 import com.gmail.at.boban.talevski.bakingapp.model.Step;
+import com.gmail.at.boban.talevski.bakingapp.utils.SharedPreferencesUtils;
 import com.gmail.at.boban.talevski.bakingapp.viewmodel.RecipeDetailsViewModel;
 import com.gmail.at.boban.talevski.bakingapp.viewmodel.RecipeStepDetailsViewModel;
 
@@ -31,8 +32,6 @@ public class RecipeDetailsFragment extends Fragment implements StepAdapter.OnCli
             "com.gmail.at.boban.talevski.bakingapp.ui.EXTRA_STEP_POSITION";
     public static final String EXTRA_RECIPE_NAME =
             "com.gmail.at.boban.talevski.bakingapp.ui.EXTRA_RECIPE_NAME";
-    public static final String EXTRA_INGREDIENT_LIST =
-            "com.gmail.at.boban.talevski.bakingapp.ui.EXTRA_INGREDIENT_LIST";
 
     private RecyclerView ingredientsRecyclerView;
     private RecyclerView stepsRecyclerView;
@@ -108,4 +107,19 @@ public class RecipeDetailsFragment extends Fragment implements StepAdapter.OnCli
             startActivity(intent);
         }
     }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // store the step position in shared preferences so it can be restored in case the app
+        // is killed and restarted. Only do this in two pane mode, there's no details view model
+        // in single pane mode
+        if (masterViewModel.isTwoPane()) {
+            SharedPreferencesUtils.putStepPositionInSharedPreferences(
+                    getActivity(), stepDetailsViewModel.getStepPosition().getValue());
+        }
+    }
+
+
 }
