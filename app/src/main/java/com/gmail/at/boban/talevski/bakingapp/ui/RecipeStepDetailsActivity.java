@@ -86,6 +86,8 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
 
             // Don't do anything with buttons so they stay on screen
             // (hence the quotes on "full screen") for navigating to prev/next recipe step
+            // Couldn't use player prev/next buttons because the player is not visible if
+            // there is no video url and we are just showing an imageview in its place
         }
 
         if (!landscape) {
