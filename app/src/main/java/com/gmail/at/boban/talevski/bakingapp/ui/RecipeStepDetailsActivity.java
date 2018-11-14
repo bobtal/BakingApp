@@ -1,5 +1,6 @@
 package com.gmail.at.boban.talevski.bakingapp.ui;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.net.Uri;
@@ -79,6 +80,12 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
             // step instructions view is not present in the landscape layout
             // so if that's the case we are in landscape mode
             landscape = true;
+
+            // hide system ui to make the video "full screen" in landscape mode
+            hideSystemUi();
+
+            // Don't do anything with buttons so they stay on screen
+            // (hence the quotes on "full screen") for navigating to prev/next recipe step
         }
 
         if (!landscape) {
@@ -294,5 +301,15 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
             player.release();
             player = null;
         }
+    }
+
+    @SuppressLint("InlinedApi")
+    private void hideSystemUi() {
+        playerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
     }
 }
