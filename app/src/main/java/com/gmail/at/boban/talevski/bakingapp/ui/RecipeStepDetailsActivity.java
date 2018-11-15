@@ -278,18 +278,18 @@ public class RecipeStepDetailsActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if ((Util.SDK_INT <= 23 || player == null)) {
+    protected void onStart() {
+        super.onStart();
+        if (Util.SDK_INT > 23) {
             initializePlayer();
             setupPlayerMediaSource();
         }
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        if (Util.SDK_INT > 23) {
+    protected void onResume() {
+        super.onResume();
+        if ((Util.SDK_INT <= 23 || player == null)) {
             initializePlayer();
             setupPlayerMediaSource();
         }
