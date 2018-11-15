@@ -39,6 +39,7 @@ public class RecipeStepDetailsFragment extends Fragment {
     // variables to keep player state
     private boolean isPlaying;
     private long currentPlayerPosition;
+
     // a "hack variable" to prevent observer's onChanged method from executing
     // if there wasn't actually a change in the step
     // it executes on initialization and/or rotation "for no apparent reason"
@@ -114,19 +115,11 @@ public class RecipeStepDetailsFragment extends Fragment {
         });
 
         setInstructionText();
-        initializePlayer();
-        setupPlayerMediaSource();
     }
 
     private void initializePlayer() {
         player = ExoPlayerFactory.newSimpleInstance(getActivity());
         playerView.setPlayer(player);
-    }
-
-    private void setInstructionText() {
-        String instruction = detailsViewModel.getStepList()
-                .get(detailsViewModel.getStepPosition().getValue()).getDescription();
-        stepInstructions.setText(instruction);
     }
 
     private void setupPlayerMediaSource() {
@@ -160,33 +153,72 @@ public class RecipeStepDetailsFragment extends Fragment {
         }
     }
 
+    private void setInstructionText() {
+        String instruction = detailsViewModel.getStepList()
+                .get(detailsViewModel.getStepPosition().getValue()).getDescription();
+        stepInstructions.setText(instruction);
+    }
+
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        // save the state in the outState
-        boolean isPlaying = playerView.getPlayer().getPlayWhenReady();
-        long currentPlayerPosition = playerView.getPlayer().getCurrentPosition();
-        int currentStep = detailsViewModel.getStepPosition().getValue();
+        // get current player status
+        isPlaying = player.getPlayWhenReady();
+        currentPlayerPosition = player.getCurrentPosition();
+        currentStep = detailsViewModel.getStepPosition().getValue();
+
+        // put current player status in outState
         outState.putBoolean(EXTRA_PLAYER_IS_PLAYING, isPlaying);
         outState.putLong(EXTRA_CURRENT_PLAYER_POSITION, currentPlayerPosition);
         outState.putInt(EXTRA_CURRENT_STEP, currentStep);
+    }
 
-        // pause the player
-        playerView.getPlayer().setPlayWhenReady(false);
+    // Before API Level 24 there is no guarantee of onStop being called.
+    // So we have to release the player as early as possible in onPause.
+    // Starting with API Level 24 (which brought multi and split window mode) onStop is guaranteed
+    // to be called and in the paused mode our activity is eventually still visible.
+    // Hence we need to wait releasing until onStop.
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (Util.SDK_INT <= 23) {
+            releasePlayer();
+        }
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        releasePlayer(true);
+    public void onStop() {
+        super.onStop();
+        if (Util.SDK_INT > 23) {
+            releasePlayer();
+        }
     }
 
-    private void releasePlayer(boolean releaseView) {
-        playerView.getPlayer().stop();
-        playerView.getPlayer().release();
-        if (releaseView) {
-            playerView = null;
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (Util.SDK_INT > 23) {
+            initializePlayer();
+            setupPlayerMediaSource();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if ((Util.SDK_INT <= 23 || player == null)) {
+            initializePlayer();
+            setupPlayerMediaSource();
+        }
+    }
+
+    private void releasePlayer() {
+        if (player != null) {
+            isPlaying = player.getPlayWhenReady();
+            currentPlayerPosition = player.getCurrentPosition();
+            player.release();
+            player = null;
         }
     }
 
